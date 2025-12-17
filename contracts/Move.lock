@@ -32,3 +32,9 @@ chain-id = "1bd5c965"
 original-published-id = "0x1c6ffbfbb6802ce3fc34265c255c3768883ec8e93b9268fea738912c3817ac1a"
 latest-published-id = "0x1c6ffbfbb6802ce3fc34265c255c3768883ec8e93b9268fea738912c3817ac1a"
 published-version = "1"
+
+[env.onechain-testnet]
+chain-id = "1bd5c965"
+original-published-id = "0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af"
+latest-published-id = "0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af"
+published-version = "1"

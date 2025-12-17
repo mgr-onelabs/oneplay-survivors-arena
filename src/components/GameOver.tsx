@@ -9,7 +9,7 @@ interface GameOverProps {
   onReturnToMenu: () => void;
 }
 
-const PACKAGE_ID = '0x1c6ffbfbb6802ce3fc34265c255c3768883ec8e93b9268fea738912c3817ac1a';
+const PACKAGE_ID = '0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af';
 const CLOCK_ID = '0x6';
 
 const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {

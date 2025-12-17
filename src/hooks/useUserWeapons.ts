@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useOneWallet } from './useOneWallet';
 import { Weapon, WeaponType, WeaponRarity } from '../types/game';
 
-const PACKAGE_ID = '0xc6c261cb39c87d87c62f0d1fb90b201cff1c9154f1d1c165e87637db44420dfc';
+const PACKAGE_ID = '0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af';
 const WEAPON_NFT_TYPE = `${PACKAGE_ID}::weapon_nft::WeaponNFT`;
 
 export const useUserWeapons = () => {

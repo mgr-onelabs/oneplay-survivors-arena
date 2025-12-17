@@ -15,8 +15,8 @@ interface DailyChestProps {
   onWeaponObtained: (weapon: Weapon) => void;
 }
 
-const PACKAGE_ID = '0xc6c261cb39c87d87c62f0d1fb90b201cff1c9154f1d1c165e87637db44420dfc';
-const REGISTRY_ID = '0x538fdb679284c9ac0bd482f28a1254480b05a78485a83ef22870fec343c667cd';
+const PACKAGE_ID = '0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af';
+const REGISTRY_ID = '0x5e7dfc8015b51e6f666c41373da2f02857f6156d862571e15d38331244c8218b';
 const CLOCK_ID = '0x6';
 const WEAPON_NFT_TYPE = `${PACKAGE_ID}::weapon_nft::WeaponNFT`;
 
