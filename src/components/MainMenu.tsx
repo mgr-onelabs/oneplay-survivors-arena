@@ -285,7 +285,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             filter: 'drop-shadow(0 0 15px rgba(255, 69, 0, 0.7))'
           }}
         >
-          SURVIVAL ARENA
+          ONE ARENA
         </h1>
       </div>
       

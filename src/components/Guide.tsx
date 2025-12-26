@@ -155,7 +155,7 @@ When wounded, an Overlord enters what survivors call "Berserker Mode" - a state 
     {
       id: 'arena',
       title: 'THE ARENA',
-      content: `The Survival Arena was not always a place of death. A thousand years ago, it stood as the Grand Colosseum of the Kingdom of Valdris - a place where warriors tested their skill in honorable combat, where champions were crowned, and where the people gathered to celebrate their heroes.
+      content: `The ONE Arena was not always a place of death. A thousand years ago, it stood as the Grand Colosseum of the Kingdom of Valdris - a place where warriors tested their skill in honorable combat, where champions were crowned, and where the people gathered to celebrate their heroes.
 
 The arena's construction took fifty years and the labor of ten thousand craftsmen. Its stones were quarried from the Sacred Mountains, blessed by priests, and laid with precision that modern architects cannot replicate. The floor was designed to be infinitely expandable - a feat of magical engineering that allowed the arena to grow or shrink based on the nature of the contest.
 
