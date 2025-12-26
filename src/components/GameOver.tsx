@@ -9,8 +9,9 @@ interface GameOverProps {
   onReturnToMenu: () => void;
 }
 
-const PACKAGE_ID = '0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af';
-const CLOCK_ID = '0x6';
+
+const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || '0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af';
+const CLOCK_ID = import.meta.env.VITE_CLOCK_ID || '0x6';
 
 const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
   // Calculate survived waves: if you die during wave 1, you've survived 0 waves

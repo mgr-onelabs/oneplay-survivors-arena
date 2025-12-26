@@ -12,8 +12,11 @@ use std::string::{Self, String};
 
 // Constants
 const COOLDOWN_PERIOD_MS: u64 = 86400000; // 24 hours in milliseconds
-const BASE_FEE_MIST: u64 = 1000000000; // 1 OCT = 1,000,000,000 MIST
-const FEE_PER_HOUR_MIST: u64 = 41666667; // ~0.0416 OCT per hour (1 OCT / 24 hours)
+// const BASE_FEE_MIST: u64 = 1000000000; // 1 OCT = 1,000,000,000 MIST
+// const FEE_PER_HOUR_MIST: u64 = 41666667; // ~0.0416 OCT per hour (1 OCT / 24 hours)
+//测试降低基础费用
+const BASE_FEE_MIST: u64 = 100000000; // 1 OCT = 100,000,0000 MIST
+const FEE_PER_HOUR_MIST: u64 = 4166667; // ~0.0416 OCT per hour (1 OCT / 24 hours)
 
 // Error codes
 const E_NOT_ENOUGH_COINS: u64 = 0;
@@ -219,7 +222,7 @@ public entry fun mint_weapon(
         // Take the fee from payment
         let fee_coin = coin::split(&mut payment, fee_required, ctx);
         // Fee goes to protocol treasury
-        let treasury_address = @0x4c786f77e9289245c5266961e3d9aa7a815fb8673da5fd5ea992a28bcd6ac3fa;
+        let treasury_address = @0x58b7207ae062b5793c4fb91d2a1efc126d3f8178ac18c9f1a085a31bd7b37270;
         transfer::public_transfer(fee_coin, treasury_address);
     } else {
         // Free mint, but still need to handle payment

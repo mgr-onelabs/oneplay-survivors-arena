@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Weapon, WeaponType, WeaponRarity } from '../types/game';
 import { getRarityColor, getRarityBorderColor, calculateFirerate } from '../data/weapons';
-import { 
+import {
   formatTimeRemaining,
   getRandomWeapon
 } from '../utils/storage';
@@ -14,12 +14,13 @@ interface DailyChestProps {
   onBack: () => void;
   onWeaponObtained: (weapon: Weapon) => void;
 }
+const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || '0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af';
+const CLOCK_ID = import.meta.env.VITE_CLOCK_ID || '0x6';
 
-const PACKAGE_ID = '0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af';
-const REGISTRY_ID = '0x5e7dfc8015b51e6f666c41373da2f02857f6156d862571e15d38331244c8218b';
-const CLOCK_ID = '0x6';
+const REGISTRY_ID = import.meta.env.VITE_REGISTRY_ID || '0x5e7dfc8015b51e6f666c41373da2f02857f6156d862571e15d38331244c8218b';
+
 const WEAPON_NFT_TYPE = `${PACKAGE_ID}::weapon_nft::WeaponNFT`;
-
+const WEAPON_MINTED = `${PACKAGE_ID}::weapon_nft::WeaponMinted`;
 const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
   const { connected, address, client, signTransaction, executeTransaction, isWalletInstalled } = useOneWallet();
   const [canOpen, setCanOpen] = useState(false);
@@ -59,17 +60,17 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
     // Determine which chest sprite to show
     const chestSpriteName = openedWeapon ? 'chest_open' : 'chest_closed';
     const sprite = spriteManager.getSprite(chestSpriteName);
-    
+
     if (sprite) {
       const size = 320;
       const x = canvas.width / 2;
       const y = canvas.height / 2;
-      
+
       // Calculate aspect ratio
       const spriteAspect = sprite.width / sprite.height;
       let drawWidth = size;
       let drawHeight = size / spriteAspect;
-      
+
       ctx.drawImage(
         sprite,
         x - drawWidth / 2,
@@ -94,17 +95,17 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
     // Draw weapon sprite
     const spriteName = `weapon_${openedWeapon.type}`;
     const sprite = spriteManager.getSprite(spriteName);
-    
+
     if (sprite) {
       const size = 200;
       const x = canvas.width / 2;
       const y = canvas.height / 2;
-      
+
       // Calculate aspect ratio
       const spriteAspect = sprite.width / sprite.height;
       let drawWidth = size;
       let drawHeight = size / spriteAspect;
-      
+
       ctx.drawImage(
         sprite,
         x - drawWidth / 2,
@@ -149,7 +150,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
           if (returnValues && returnValues[0]) {
             const bytes = Uint8Array.from(returnValues[0][0]);
             const timeRemainingMs = Number(new DataView(bytes.buffer).getBigUint64(0, true));
-            
+
             if (timeRemainingMs === 0) {
               setCanOpen(true);
               setTimeRemaining("NOW");
@@ -158,7 +159,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
             } else {
               setCanOpen(false);
               setTimeRemaining(formatTimeRemaining(timeRemainingMs));
-              
+
               // Fetch fee while keeping loading state
               const feeTx = new Transaction();
               feeTx.moveCall({
@@ -169,12 +170,12 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
                   feeTx.object(CLOCK_ID)
                 ]
               });
-              
+
               const feeResult = await client.devInspectTransactionBlock({
                 transactionBlock: feeTx,
                 sender: address,
               });
-              
+
               if (feeResult.results && feeResult.results[0] && feeResult.results[0].returnValues) {
                 const feeBytes = Uint8Array.from(feeResult.results[0].returnValues[0][0]);
                 const feeMist = Number(new DataView(feeBytes.buffer).getBigUint64(0, true));
@@ -212,7 +213,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
     if (!content || content.dataType !== 'moveObject') return null;
 
     const fields = content.fields;
-    
+
     // Map u8 type to Enum
     const typeMap: Record<number, WeaponType> = {
       0: WeaponType.PISTOL,
@@ -250,7 +251,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
 
   const handleOpenCrate = async (payFee: boolean = false) => {
     if ((!canOpen && !payFee) || isOpening) return;
-    
+
     if (!connected || !client) {
       setMintError("Please connect your OneChain wallet first!");
       return;
@@ -258,18 +259,17 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
 
     setMintError(null);
     setIsOpening(true);
-    
+
     try {
       // Generate random weapon stats for minting
       const randomWeapon = getRandomWeapon();
       const tx = new Transaction();
       const amountToPay = payFee ? feeRequired : 0;
-      
       // Always split at least 1 MIST to create a valid coin object (even for free mints)
       // The contract will return it if no fee is required
       const minAmount = amountToPay > 0 ? amountToPay : 1;
       const [paymentCoin] = tx.splitCoins(tx.gas, [minAmount]);
-      
+
       const weaponTypeMap: Record<string, number> = {
         [WeaponType.PISTOL]: 0,
         [WeaponType.SHOTGUN]: 1,
@@ -278,7 +278,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
         [WeaponType.RIFLE]: 4,
         [WeaponType.MACHINE_GUN]: 5,
       };
-      
+
       const rarityMap: Record<string, number> = {
         [WeaponRarity.COMMON]: 1,
         [WeaponRarity.UNCOMMON]: 2,
@@ -296,7 +296,9 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
       const nameBytes = stringToBytes(randomWeapon.name);
       const descBytes = stringToBytes(randomWeapon.description);
       const urlBytes = stringToBytes("https://example.com/weapon.png");
-
+      console.log("PACKAGE_ID:", { PACKAGE_ID });
+      console.log("CLOCK_ID:", { CLOCK_ID });
+      console.log("REGISTRY_ID:", { REGISTRY_ID });
       tx.moveCall({
         target: `${PACKAGE_ID}::weapon_nft::mint_weapon`,
         arguments: [
@@ -325,34 +327,19 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
         range: scaledRange,
         amountToPay: amountToPay,
       });
-      
+
       const result = await executeTransaction(tx);
       console.log("Mint success:", result);
 
       // Extract the created weapon NFT object ID from transaction result
       let weaponObjectId: string | null = null;
-      
+
       // Check transaction effects for created objects
-      if (result.effects?.created) {
-        for (const created of result.effects.created) {
-          if (created.reference?.objectId) {
-            const objId = created.reference.objectId;
-            // Verify it's a WeaponNFT by checking its type
-            try {
-              const obj = await client.getObject({
-                id: objId,
-                options: { showType: true, showContent: true }
-              });
-              if (obj.data?.type === WEAPON_NFT_TYPE) {
-                weaponObjectId = objId;
-                break;
-              }
-            } catch (e) {
-              console.warn("Failed to verify object type:", e);
-            }
-          }
-        }
+      if (result.events) {
+        weaponObjectId = result.events.filter((e: any) => e.type === WEAPON_MINTED)[0]?.parsedJson.weapon_id;
       }
+      console.log("Weapon object ID:", weaponObjectId);
+
 
       // If we found the weapon object, fetch its full data
       if (weaponObjectId && client) {
@@ -361,7 +348,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
             id: weaponObjectId,
             options: { showContent: true }
           });
-          
+
           const parsedWeapon = parseWeaponFromObject(weaponObj);
           if (parsedWeapon) {
             setOpenedWeapon(parsedWeapon);
@@ -384,8 +371,8 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
         onWeaponObtained(randomWeapon);
       }
 
-      setCanOpen(false); 
-      
+      setCanOpen(false);
+
     } catch (error: any) {
       console.error("Minting failed:", error);
       console.error("Error details:", {
@@ -395,7 +382,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
         stack: error.stack,
       });
       const errorMessage = error.message || error.toString() || "Unknown error";
-      
+
       // Check for wallet permission errors
       if (errorMessage.includes('viewAccount') || errorMessage.includes('suggestTransaction') || errorMessage.includes('permission')) {
         setMintError("Your wallet is not connected properly. Please reconnect your wallet and try again.");
@@ -416,13 +403,13 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
         className="absolute inset-0 w-screen h-screen object-cover pointer-events-none"
         style={{ imageRendering: 'pixelated', zIndex: 0 }}
       />
-      
+
       {/* Back button */}
       <button
         onClick={handleBack}
         disabled={isOpening}
         className="absolute top-6 left-6 border-4 border-white py-3 px-8 text-white font-bold bg-[#5a0000] hover:bg-[#7a0000] disabled:bg-gray-600 transition-all"
-        style={{ 
+        style={{
           fontSize: '18px',
           imageRendering: 'pixelated',
           zIndex: 20
@@ -430,10 +417,10 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
       >
         ← BACK
       </button>
-      
+
       <div className="border-4 border-white p-5 text-center relative max-w-3xl w-full mx-4" style={{ backgroundColor: '#3a0000', imageRendering: 'pixelated', zIndex: 10 }}>
         <h1 className="text-white mb-3 font-bold" style={{ fontSize: '28px' }}>DAILY CHEST</h1>
-        
+
         {/* Chest Canvas Container - Relative positioning for weapon placement */}
         <div className="relative flex justify-center mb-2" style={{ zIndex: 10 }}>
           {/* Weapon Canvas - Display above chest when opened, touching it */}
@@ -447,7 +434,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
               />
             </div>
           )}
-          
+
           {/* Chest Canvas - Centerpiece */}
           <canvas
             ref={chestCanvasRef}
@@ -457,13 +444,13 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
             className={isOpening ? 'animate-pulse' : ''}
           />
         </div>
-        
+
         {openedWeapon ? (
           <div className="space-y-2">
             <div className="text-[#ffd700] mb-1 font-bold" style={{ fontSize: '20px', textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}>
               YOU OBTAINED:
             </div>
-            <div 
+            <div
               className="border-4 p-4 mx-auto max-w-xl"
               style={{
                 backgroundColor: getRarityColor(openedWeapon.rarity),
@@ -486,11 +473,11 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
                 </div>
               </div>
             </div>
-            
+
             <p className="text-[#00d4ff] font-bold mt-2 mb-6" style={{ fontSize: '14px', textShadow: '1px 1px 0px rgba(0,0,0,0.8)' }}>
               CHECK YOUR INVENTORY TO VIEW YOUR NEW WEAPON!
             </p>
-            
+
             <button
               onClick={handleBack}
               className="bg-green-700 hover:bg-green-600 text-white border-4 border-white py-3 px-10 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] hover:translate-y-1 hover:shadow-none"
@@ -512,7 +499,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
                 <p className="text-gray-300 mb-6 text-xs">
                   DISCOVER POWERFUL WEAPONS WITH UNIQUE STATS
                 </p>
-                
+
                 {mintError && (
                   <div className="text-red-400 border border-red-400 p-2 mb-4 bg-red-900/50 text-xs">
                     {mintError}
@@ -539,11 +526,11 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
                   YOU HAVE ALREADY OPENED YOUR DAILY CHEST
                 </p>
                 <p className="text-[#ffd700] mb-3 font-bold" style={{ fontSize: '18px', textShadow: '1px 1px 0px rgba(0,0,0,0.8)' }}>
-                  {!connected ? "CONNECT WALLET TO CHECK STATUS" : 
-                   (isLoadingState ? "CHECKING STATUS..." : 
-                    (timeRemaining ? `NEXT CHEST AVAILABLE IN: ${timeRemaining}` : "CHECKING STATUS..."))}
+                  {!connected ? "CONNECT WALLET TO CHECK STATUS" :
+                    (isLoadingState ? "CHECKING STATUS..." :
+                      (timeRemaining ? `NEXT CHEST AVAILABLE IN: ${timeRemaining}` : "CHECKING STATUS..."))}
                 </p>
-                
+
                 {feeRequired > 0 && (
                   <div className="mt-2">
                     <p className="text-white mb-1 text-xs">OR OPEN IMMEDIATELY</p>
@@ -556,7 +543,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
                       {isOpening ? 'MINTING...' : `PAY ${(feeRequired / 1_000_000_000).toFixed(4)} OCT FEE`}
                     </button>
                     <p className="text-gray-400 text-xs mt-1">
-                      (1 OCT Base + {((feeRequired / 1_000_000_000) - 1).toFixed(4)} Time Fee)
+                      (0.1 OCT Base + {((feeRequired / 1_000_000_000) - 0.1).toFixed(4)} Time Fee)
                     </p>
                   </div>
                 )}

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { SuiClient } from '@onelabs/sui/client';
 
 interface WalletState {
@@ -28,18 +28,18 @@ const WALLET_ADDRESS_KEY = 'onechain_wallet_address';
 // Helper functions (copied from original hook)
 const getWallet = (): any => {
   if (typeof window === 'undefined') return null;
-  
+
   if ((window.navigator as any).wallets) {
     const wallets = (window.navigator as any).wallets;
-    const oneWallet = wallets.find((w: any) => 
-      w.name?.toLowerCase().includes('one') || 
+    const oneWallet = wallets.find((w: any) =>
+      w.name?.toLowerCase().includes('one') ||
       w.name?.toLowerCase().includes('onewallet') ||
       w.name?.toLowerCase().includes('sui')
     );
     if (oneWallet) return oneWallet;
     if (wallets.length > 0) return wallets[0];
   }
-  
+
   const checks = [
     (window as any).onechain,
     (window as any).onechainWallet,
@@ -51,7 +51,7 @@ const getWallet = (): any => {
     (window as any).__ONE_WALLET__,
     (window as any).__oneWallet__,
   ];
-  
+
   for (const check of checks) {
     if (check) return check;
   }
@@ -78,7 +78,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const persistedState = loadPersistedState();
-  
+
   const [walletState, setWalletState] = useState<WalletState>({
     connected: persistedState.connected,
     address: persistedState.address,
@@ -88,14 +88,20 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   });
   const [walletAvailable, setWalletAvailable] = useState(false);
 
+  const networks = {
+    testnet: { url: 'https://rpc-testnet.onelabs.cc:443' },
+    mainnet: { url: "https://rpc-mainnet.onelabs.cc:443" },
+  };
+  type NetworkKey = keyof typeof networks;
+  const NETWORK_RPC = (import.meta.env.VITE_NETWORK as NetworkKey) || 'testnet';
   // OneChain Testnet chain identifier
   const ONECHAIN_TESTNET_CHAIN = 'onechain:testnet'; // Common identifier for OneChain Testnet
-  const ONECHAIN_TESTNET_RPC = 'https://rpc-testnet.onelabs.cc';
+
 
   // Initialize client
   useEffect(() => {
     const client = new SuiClient({
-      url: 'https://rpc-testnet.onelabs.cc:443',
+      url: networks[NETWORK_RPC].url,
     });
     setWalletState((prev) => ({ ...prev, client }));
   }, []);
@@ -107,14 +113,14 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       if (wallet) {
         setWalletAvailable(true);
         const suiProvider = getSuiProvider(wallet);
-        
+
         // Auto-reconnect if persisted or if provider is already connected
         if (suiProvider) {
           const accounts = suiProvider.accounts || wallet.accounts;
           if (accounts && accounts.length > 0) {
             const address = accounts[0].address || accounts[0];
             const addressStr = typeof address === 'string' ? address : String(address);
-            
+
             // Only update if state is different (to avoid loops)
             if (!walletState.connected || walletState.address !== addressStr) {
               setWalletState((prev) => ({
@@ -135,13 +141,13 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     checkWallet();
     const handleLoad = () => checkWallet();
     window.addEventListener('load', handleLoad);
-    
+
     // Accounts changed listener
     const handleAccountsChanged = () => {
       console.log('Account changed event');
       checkWallet();
     };
-    
+
     window.addEventListener('onewallet#accountsChanged', handleAccountsChanged);
     window.addEventListener('oneWallet#accountsChanged', handleAccountsChanged);
     window.addEventListener('accountsChanged', handleAccountsChanged);
@@ -179,13 +185,13 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         // But let's force check immediately
         const accounts = await suiProvider.getAccounts();
         if (accounts && accounts.length > 0) {
-            const address = accounts[0].address || accounts[0];
-            const addressStr = typeof address === 'string' ? address : String(address);
-            setWalletState(prev => ({ ...prev, connected: true, address: addressStr }));
-            localStorage.setItem(WALLET_STORAGE_KEY, 'true');
-            localStorage.setItem(WALLET_ADDRESS_KEY, addressStr);
-            // Check chain after connecting
-            await checkChain();
+          const address = accounts[0].address || accounts[0];
+          const addressStr = typeof address === 'string' ? address : String(address);
+          setWalletState(prev => ({ ...prev, connected: true, address: addressStr }));
+          localStorage.setItem(WALLET_STORAGE_KEY, 'true');
+          localStorage.setItem(WALLET_ADDRESS_KEY, addressStr);
+          // Check chain after connecting
+          await checkChain();
         }
       }
     } catch (error) {
@@ -292,7 +298,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       if (chainId) {
         const chainLower = chainId.toLowerCase().trim();
         // Check if chain is exactly "testnet" or contains "testnet" (case-insensitive)
-        isCorrectChain = chainLower === 'testnet' || chainLower.includes('testnet');
+        isCorrectChain = chainLower === NETWORK_RPC || chainLower.includes(NETWORK_RPC);
       } else {
         // If we can't determine chain, assume it might be correct if connected
         // This is a fallback - ideally wallet should provide chain info
