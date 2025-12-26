@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useOneWallet } from '../hooks/useOneWallet';
 import { useMusic } from '../contexts/MusicContext';
 import WalletWarningModal from './WalletWarningModal';
@@ -12,6 +13,7 @@ interface MainMenuProps {
 }
 
 const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }: MainMenuProps) => {
+  const { t, i18n } = useTranslation();
   const { connected, address, connect, disconnect, installWallet, isWalletInstalled, isCorrectChain, chainId, checkChain } = useOneWallet();
   const { isMusicEnabled, toggleMusic, isSfxEnabled, toggleSfx } = useMusic();
   
@@ -31,31 +33,31 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
   const newsEntries = [
     {
       id: 'legendary_machine_gun',
-      title: 'LEGENDARY MACHINE GUN',
-      date: 'Dec 1, 2025',
+      title: t('mainMenu.news.legendary_machine_gun.title'),
+      date: t('mainMenu.news.legendary_machine_gun.date'),
       image: '/assets/pngegg (2).png',
-      description: 'A new Legendary weapon has been discovered! The Machine Gun is now available exclusively from Daily Chests. This ultra-rare weapon features an extremely high fire rate and can only be obtained as a Legendary rarity. Good luck finding one!'
+      description: t('mainMenu.news.legendary_machine_gun.description')
     },
     {
       id: 'vest_system',
-      title: 'VEST SYSTEM ADDED',
-      date: 'Nov 30, 2025',
+      title: t('mainMenu.news.vest_system.title'),
+      date: t('mainMenu.news.vest_system.date'),
       image: '/assets/vest.png',
-      description: 'Protective vests are now available! Collect vests to gain up to 60 blue health (armor) that absorbs damage before your regular health. Vests can spawn randomly or be dropped by defeated enemies. Stay protected out there!'
+      description: t('mainMenu.news.vest_system.description')
     },
     {
       id: 'ammo_system',
-      title: 'AMMO DROP SYSTEM',
-      date: 'Nov 29, 2025',
+      title: t('mainMenu.news.ammo_system.title'),
+      date: t('mainMenu.news.ammo_system.date'),
       image: '/assets/ammo.png',
-      description: 'Ammo management is now in effect! Non-sword weapons have limited ammo per wave. Collect ammo pickups that spawn randomly or drop from enemies to keep your weapons loaded. Watch your ammo count and stay stocked!'
+      description: t('mainMenu.news.ammo_system.description')
     },
     {
       id: 'encyclopedia_nov25_2025',
-      title: 'ENCYCLOPEDIA ADDED',
-      date: 'Nov 25, 2025',
+      title: t('mainMenu.news.encyclopedia_nov25_2025.title'),
+      date: t('mainMenu.news.encyclopedia_nov25_2025.date'),
       image: '/assets/guide/encyclopedia_preview.png',
-      description: 'A comprehensive Encyclopedia has been added to the game! Learn about all enemy types, their abilities, lore, and discover pro tips for using your abilities effectively. Access it from the GUIDE button in the top-left corner.'
+      description: t('mainMenu.news.encyclopedia_nov25_2025.description')
     }
   ];
 
@@ -154,12 +156,12 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               imageRendering: 'pixelated',
               opacity: isMusicEnabled ? 1 : 0.5
             }}
-            title={isMusicEnabled ? 'Music ON - Click to turn off' : 'Music OFF - Click to turn on'}
+            title={t('musicOnTitle')}
           >
             {isMusicEnabled ? '🎵' : '🔇'}
           </button>
           <span className="text-white font-bold text-sm bg-black/50 px-2 py-1 rounded border border-white/20" style={{ imageRendering: 'pixelated' }}>
-            MUSIC {isMusicEnabled ? 'ON' : 'OFF'}
+            {t('music')} {isMusicEnabled ? t('on') : t('off')}
           </span>
         </div>
 
@@ -176,12 +178,12 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               imageRendering: 'pixelated',
               opacity: isSfxEnabled ? 1 : 0.5
             }}
-            title={isSfxEnabled ? 'SFX ON - Click to turn off' : 'SFX OFF - Click to turn on'}
+            title={t('sfxOnTitle')}
           >
             {isSfxEnabled ? '🔊' : '🔈'}
           </button>
           <span className="text-white font-bold text-sm bg-black/50 px-2 py-1 rounded border border-white/20" style={{ imageRendering: 'pixelated' }}>
-            SFX {isSfxEnabled ? 'ON' : 'OFF'}
+            {t('sfx')} {isSfxEnabled ? t('on') : t('off')}
           </span>
         </div>
 
@@ -197,12 +199,12 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               fontSize: '24px',
               imageRendering: 'pixelated'
             }}
-            title="Encyclopedia / Guide"
+            title={t('guideTitle')}
           >
             📖
           </button>
           <span className="text-white font-bold text-sm bg-black/50 px-2 py-1 rounded border border-white/20" style={{ imageRendering: 'pixelated' }}>
-            GUIDE
+            {t('guide')}
           </span>
         </div>
 
@@ -216,7 +218,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                 fontSize: '24px',
                 imageRendering: 'pixelated'
               }}
-              title="Latest News"
+              title={t('newsTitle')}
             >
               📰
             </button>
@@ -229,9 +231,23 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             )}
           </div>
           <span className="text-white font-bold text-sm bg-black/50 px-2 py-1 rounded border border-white/20" style={{ imageRendering: 'pixelated' }}>
-            NEWS
+            {t('news')}
           </span>
         </div>
+      </div>
+
+      {/* Language switcher - top right */}
+      <div className="absolute top-8 right-80 z-20">
+        <button
+          onClick={() => {
+            const newLang = i18n.language === 'en' ? 'zh' : 'en';
+            i18n.changeLanguage(newLang);
+          }}
+          className="wallet-button border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded"
+          style={{ fontSize: '14px', imageRendering: 'pixelated' }}
+        >
+          {i18n.language === 'en' ? '中文' : 'English'}
+        </button>
       </div>
 
       {/* Wallet connection button - top right */}
@@ -250,12 +266,12 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                 className="wallet-button connected border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded"
                 style={{ fontSize: '14px', imageRendering: 'pixelated' }}
               >
-                DISCONNECT
+                {t('disconnect')}
               </button>
             </div>
             {!isCorrectChain && (
               <div className="text-red-400 text-xs font-bold bg-red-900/50 px-2 py-1 rounded border border-red-400">
-                WRONG NETWORK - SWITCH TO ONECHAIN TESTNET
+                {t('wrongNetworkSwitch')}
               </div>
             )}
           </div>
@@ -265,7 +281,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             className="wallet-button border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded"
             style={{ fontSize: '14px', imageRendering: 'pixelated' }}
           >
-            {isWalletInstalled() ? 'CONNECT ONECHAIN WALLET' : 'INSTALL ONECHAIN WALLET'}
+            {isWalletInstalled() ? t('connectWallet') : t('installWallet')}
           </button>
         )}
       </div>
@@ -285,7 +301,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             filter: 'drop-shadow(0 0 15px rgba(255, 69, 0, 0.7))'
           }}
         >
-          ONE ARENA
+          {t('gameTitle')}
         </h1>
       </div>
       
@@ -300,7 +316,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               imageRendering: 'pixelated'
             }}
           >
-            PLAY
+            {t('play')}
           </button>
           
           {/* Trophy icon button - positioned to the right, slightly upward */}
@@ -321,7 +337,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             onMouseLeave={(e) => {
               e.currentTarget.style.filter = 'drop-shadow(2px 2px 0px rgba(0,0,0,0.5))';
             }}
-            title="Achievements"
+            title={t('achievements')}
           >
             🏆
           </button>
@@ -335,7 +351,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             imageRendering: 'pixelated'
           }}
         >
-          INVENTORY
+          {t('inventory')}
         </button>
 
         <button
@@ -346,7 +362,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             imageRendering: 'pixelated'
           }}
         >
-          DAILY CHEST
+          {t('dailyChest')}
         </button>
 
         <button
@@ -357,34 +373,34 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             imageRendering: 'pixelated'
           }}
         >
-          MARKETPLACE
+          {t('marketplace')}
         </button>
       </div>
 
       {/* Controls Info - Bottom Center */}
       <div className="absolute bottom-8 left-0 right-0 text-center z-10 pointer-events-none">
         <div className="inline-block bg-black/70 border-2 border-white/30 p-4 rounded text-white/80">
-          <p className="text-sm font-bold mb-2 text-yellow-400">CONTROLS</p>
+          <p className="text-sm font-bold mb-2 text-yellow-400">{t('controls')}</p>
           <div className="flex gap-8 text-xs">
             <div className="flex flex-col items-center">
               <span className="font-bold text-white">WASD</span>
-              <span>MOVE</span>
+              <span>{t('move')}</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="font-bold text-white">MOUSE</span>
-              <span>AIM</span>
+              <span>{t('aim')}</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="font-bold text-white">L-CLICK</span>
-              <span>SHOOT</span>
+              <span>{t('shoot')}</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="font-bold text-white">1 - 5</span>
-              <span>ABILITIES</span>
+              <span>{t('abilities')}</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="font-bold text-white">E</span>
-              <span>INTERACT</span>
+              <span>{t('interact')}</span>
             </div>
           </div>
         </div>
@@ -412,20 +428,22 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               className="text-red-400 text-2xl font-bold mb-4 text-center"
               style={{ imageRendering: 'pixelated' }}
             >
-              WRONG NETWORK
+              {t('wrongNetworkTitle')}
             </h2>
             
             <p className="text-white text-lg mb-4 text-center">
-              Your wallet is connected to the wrong network.
+              {t('wrongNetworkMessage')}
             </p>
             
             <p className="text-yellow-300 text-base mb-6 text-center font-bold">
-              Please switch to <span className="text-cyan-300">OneChain Testnet</span> in your wallet settings.
+                            <Trans i18nKey="switchToTestnet">
+                Please switch to <span className="text-cyan-300">OneChain Testnet</span> in your wallet settings.
+              </Trans>
             </p>
 
             {chainId && (
               <p className="text-gray-400 text-sm mb-6 text-center">
-                Current network: {chainId}
+                {t('currentNetwork', { chainId })}
               </p>
             )}
             
@@ -438,14 +456,14 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                 className="border-2 border-white py-2 px-6 text-white font-bold transition-all bg-gray-800 hover:bg-gray-700"
                 style={{ fontSize: '16px', imageRendering: 'pixelated' }}
               >
-                CHECK AGAIN
+                {t('checkAgain')}
               </button>
               <button
                 onClick={() => setShowChainWarning(false)}
                 className="border-2 border-white py-2 px-6 text-white font-bold transition-all bg-red-800 hover:bg-red-700"
                 style={{ fontSize: '16px', imageRendering: 'pixelated' }}
               >
-                CLOSE
+                {t('close')}
               </button>
             </div>
           </div>
@@ -476,7 +494,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               className="text-white text-2xl font-bold mb-6 text-center border-b-4 border-white pb-4"
               style={{ imageRendering: 'pixelated' }}
             >
-              LATEST NEWS
+              {t('latestNews')}
             </h2>
             
             {/* News Entries */}
@@ -529,16 +547,15 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               className="text-yellow-400 text-2xl font-bold mb-4 text-center"
               style={{ imageRendering: 'pixelated' }}
             >
-              MARKETPLACE
+              {t('marketplace')}
             </h2>
             
             <p className="text-white text-lg mb-6 text-center font-bold">
-              COMING SOON
+              {t('comingSoon')}
             </p>
             
             <p className="text-gray-300 text-base mb-6 text-center">
-              The marketplace feature is under development. 
-              Check back soon to buy and sell weapons!
+              {t('marketplaceComingSoon')}
             </p>
             
             <div className="flex justify-center">
@@ -547,7 +564,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                 className="border-2 border-white py-2 px-8 text-white font-bold transition-all bg-gray-800 hover:bg-gray-700"
                 style={{ fontSize: '16px', imageRendering: 'pixelated' }}
               >
-                CLOSE
+                {t('close')}
               </button>
             </div>
           </div>
@@ -559,4 +576,3 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
 };
 
 export default MainMenu;
-

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useOneWallet } from '../contexts/WalletContext';
 import { ACHIEVEMENTS } from '../data/achievements';
@@ -19,6 +20,7 @@ interface OwnedAchievement {
 }
 
 const Achievements = ({ onBack }: AchievementsProps) => {
+  const { t } = useTranslation();
   const { connected, address, client } = useOneWallet();
   const [ownedAchievements, setOwnedAchievements] = useState<OwnedAchievement[]>([]);
   const [loading, setLoading] = useState(false);
@@ -113,24 +115,24 @@ const Achievements = ({ onBack }: AchievementsProps) => {
           zIndex: 20
         }}
       >
-        ← BACK
+        {t('back')}
       </button>
 
       <div className="border-4 border-white p-8 text-center relative max-w-6xl w-full mx-4 h-[80vh] flex flex-col" style={{ backgroundColor: 'rgba(58, 0, 0, 0.9)', imageRendering: 'pixelated', zIndex: 10 }}>
-        <h1 className="text-white mb-8 font-bold" style={{ fontSize: '48px', textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}>ACHIEVEMENTS</h1>
+        <h1 className="text-white mb-8 font-bold" style={{ fontSize: '48px', textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}>{t('achievements')}</h1>
         
         {loading && (
-          <div className="text-yellow-300 text-xl font-bold mb-4 animate-pulse">LOADING ACHIEVEMENTS...</div>
+          <div className="text-yellow-300 text-xl font-bold mb-4 animate-pulse">{t('loadingAchievements')}</div>
         )}
 
         {!connected && (
-          <div className="text-gray-400 text-lg font-bold mb-4">Connect your wallet to view achievements</div>
+          <div className="text-gray-400 text-lg font-bold mb-4">{t('connectWalletToViewAchievements')}</div>
         )}
 
         <div className="overflow-y-auto flex-1 pr-4 custom-scrollbar">
           {displayedAchievements.length === 0 && !loading && connected && (
             <div className="text-gray-400 text-lg font-bold text-center py-8">
-              No achievements owned yet. Play the game to unlock achievements!
+              {t('noAchievementsOwned')}
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -152,15 +154,15 @@ const Achievements = ({ onBack }: AchievementsProps) => {
                     <h3 className="font-bold text-xl text-yellow-400">
                       {achievement.title}
                     </h3>
-                    <span className="text-gray-400 text-sm">Wave {achievement.waveRequirement}</span>
+                    <span className="text-gray-400 text-sm">{t('wave', { wave: achievement.waveRequirement })}</span>
                   </div>
                   <p className="text-white/80 text-sm mb-2">{achievement.description}</p>
                   <div className="mt-auto pt-2 border-t border-white/20 flex flex-col gap-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-green-400 text-xs font-bold">OWNED</span>
+                      <span className="text-green-400 text-xs font-bold">{t('owned')}</span>
                     </div>
                     <div className="text-gray-300 text-xs break-all">
-                      NFT ID: {achievement.nftId}
+                      {t('nftId', { nftId: achievement.nftId })}
                     </div>
                   </div>
                 </div>

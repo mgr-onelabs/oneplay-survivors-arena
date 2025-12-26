@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef } from 'react';
 import { Weapon } from '../types/game';
 import { getRarityColor, getRarityBorderColor } from '../data/weapons';
@@ -12,6 +13,7 @@ interface WeaponSelectionProps {
 }
 
 const WeaponSelection = ({ onSelectWeapon, onBack, availableWeapons, loading }: WeaponSelectionProps) => {
+  const { t } = useTranslation();
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
   const [spritesLoaded, setSpritesLoaded] = useState(false);
 
@@ -86,15 +88,15 @@ const WeaponSelection = ({ onSelectWeapon, onBack, availableWeapons, loading }: 
             zIndex: 20
           }}
         >
-          ← BACK
+          {t('back')}
         </button>
       )}
       <div className="text-center pt-24 pb-8 relative flex-shrink-0" style={{ zIndex: 10 }}>
-        <h1 className="mb-4 text-white" style={{ fontSize: '40px' }}>CHOOSE A WEAPON FROM YOUR INVENTORY</h1>
+        <h1 className="mb-4 text-white" style={{ fontSize: '40px' }}>{t('chooseAWeapon')}</h1>
         
         {loading && (
           <div className="text-yellow-300 text-center font-bold text-2xl animate-pulse">
-            LOADING WEAPONS...
+            {t('loadingWeapons')}
           </div>
         )}
       </div>

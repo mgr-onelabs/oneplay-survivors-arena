@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { ACTIVE_ABILITIES } from '../data/activeAbilities';
 import { PixelIcon } from '../utils/pixelIcons';
 
@@ -30,6 +31,7 @@ interface EnemyData {
 }
 
 const Guide = ({ onBack }: GuideProps) => {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<GuideCategory>('enemies');
   const [selectedEnemy, setSelectedEnemy] = useState<string>('swarmer');
   const [selectedAbility, setSelectedAbility] = useState<string>('shield');
@@ -37,114 +39,96 @@ const Guide = ({ onBack }: GuideProps) => {
   const enemies: EnemyData[] = [
     {
       id: 'swarmer',
-      name: 'SWARMER',
-      title: 'The Living Bomb',
+      name: t('guide.enemies.swarmer.name'),
+      title: t('guide.enemies.swarmer.title'),
       type: 'weak',
       image: '/assets/sprites/enemy_weak.png',
-      hp: 'Low',
-      speed: 'Very Fast',
-      damage: 'High (Explosion)',
-      description: 'Volatile green goblins that sprint toward their target and detonate on impact.',
-      lore: `The Swarmers were once the miners of the old kingdom - small, hardy creatures that worked the depths beneath the arena. When the corruption took hold, their bodies became vessels for unstable energy.
-
-Their sickly green glow is the result of corrupted minerals fused into their flesh. The pickaxes and tools they once used for honest work are now wielded as crude weapons, though they rarely get close enough to use them.
-
-These creatures feel no pain, no fear - only an overwhelming compulsion to reach their target. The moment they make contact, the volatile energy within them ruptures in a devastating explosion. Arena veterans call them "Green Death" and prioritize eliminating them at range.
-
-Their crowned leader, visible by the golden helmet fused to its skull, was once the foreman of the mining operation. Even in corruption, it leads its workers to their explosive doom.`,
+      hp: t('guide.enemies.swarmer.hp'),
+      speed: t('guide.enemies.swarmer.speed'),
+      damage: t('guide.enemies.swarmer.damage'),
+      description: t('guide.enemies.swarmer.description'),
+      lore: t('guide.enemies.swarmer.lore'),
       abilities: [
         {
-          name: 'Kamikaze Detonation',
-          description: 'Explodes on contact with the player, dealing massive area damage.',
-          details: 'Upon touching the player, the Swarmer\'s volatile core ruptures instantly, creating a deadly explosion that damages everything caught in the blast radius. The explosion is unavoidable once contact is made - your only defense is to kill them before they reach you.',
+          name: t('guide.enemies.swarmer.abilities.0.name'),
+          description: t('guide.enemies.swarmer.abilities.0.description'),
+          details: t('guide.enemies.swarmer.abilities.0.details'),
           image: '/assets/guide/swarmer_explosion.png'
         },
         {
-          name: 'Relentless Pursuit',
-          description: 'Charges directly at the player with no self-preservation.',
-          details: 'Swarmers have the highest movement speed of any enemy type. They take the shortest path to the player and never retreat or take cover. Their single-minded aggression makes them predictable but dangerous in numbers.',
+          name: t('guide.enemies.swarmer.abilities.1.name'),
+          description: t('guide.enemies.swarmer.abilities.1.description'),
+          details: t('guide.enemies.swarmer.abilities.1.details'),
           image: '/assets/guide/swarmer_pursuit.png'
         },
         {
-          name: 'Swarm Spawning',
-          description: 'Always spawns in large groups to overwhelm defenses.',
-          details: 'Swarmers never appear alone. They spawn in clusters, often from multiple directions simultaneously. In later waves, swarm sizes increase dramatically, creating waves of green death that require area weapons or abilities to handle effectively.',
+          name: t('guide.enemies.swarmer.abilities.2.name'),
+          description: t('guide.enemies.swarmer.abilities.2.description'),
+          details: t('guide.enemies.swarmer.abilities.2.details'),
           image: '/assets/guide/swarmer_swarm.png'
         }
       ]
     },
     {
       id: 'soldier',
-      name: 'HUNTER',
-      title: 'The Corrupted Beast',
+      name: t('guide.enemies.soldier.name'),
+      title: t('guide.enemies.soldier.title'),
       type: 'normal',
       image: '/assets/sprites/enemy_normal.png',
-      hp: 'Medium',
-      speed: 'Normal',
-      damage: 'Medium',
-      description: 'Twisted spider-like creatures that attack from range with homing and standard projectiles.',
-      lore: `The Hunters were once the arena's guard beasts - magically enhanced creatures bred to patrol the colosseum's perimeter. Their multiple limbs and keen senses made them perfect sentinels.
-
-The corruption transformed them into nightmarish predators. Their bodies elongated, grew additional appendages, and developed the ability to generate and launch concentrated energy projectiles. The purple crystals sprouting from their backs are corruption nodes that power their ranged attacks.
-
-Unlike the mindless Swarmers, Hunters are cunning. They maintain distance, circle their prey, and coordinate attacks with other corrupted. Their red eyes can track movement in complete darkness, and their projectiles home in on targets with supernatural accuracy.
-
-The most disturbing aspect of the Hunters is their intelligence. They remember. Survivors report being stalked by the same Hunter across multiple arena runs, as if the creature holds a grudge.`,
+      hp: t('guide.enemies.soldier.hp'),
+      speed: t('guide.enemies.soldier.speed'),
+      damage: t('guide.enemies.soldier.damage'),
+      description: t('guide.enemies.soldier.description'),
+      lore: t('guide.enemies.soldier.lore'),
       abilities: [
         {
-          name: 'Homing Projectiles',
-          description: 'Fires tracking energy bolts that follow the player.',
-          details: 'The Hunter launches blue homing projectiles from its corruption crystals. These projectiles slowly track the player\'s position and can be destroyed by player weapons, but their tracking makes them difficult to avoid if ignored.',
+          name: t('guide.enemies.soldier.abilities.0.name'),
+          description: t('guide.enemies.soldier.abilities.0.description'),
+          details: t('guide.enemies.soldier.abilities.0.details'),
           image: '/assets/guide/hunter_homing.png'
         },
         {
-          name: 'Standard Projectiles',
-          description: 'Fires fast-moving straight-line projectiles.',
-          details: 'In addition to homing shots, Hunters fire orange energy bolts in straight lines toward the player\'s current position. These travel faster than homing projectiles but don\'t track. Both projectile types can be active simultaneously, creating a barrage of attacks.',
+          name: t('guide.enemies.soldier.abilities.1.name'),
+          description: t('guide.enemies.soldier.abilities.1.description'),
+          details: t('guide.enemies.soldier.abilities.1.details'),
           image: '/assets/guide/hunter_projectile.png'
         },
         {
-          name: 'Tactical Movement',
-          description: 'Maintains optimal combat distance while attacking.',
-          details: 'Hunters try to stay at medium range from the player. If you close the distance, they retreat while firing. If you flee, they pursue relentlessly. This behavior makes them dangerous harassers that whittle down your health over time.',
+          name: t('guide.enemies.soldier.abilities.2.name'),
+          description: t('guide.enemies.soldier.abilities.2.description'),
+          details: t('guide.enemies.soldier.abilities.2.details'),
           image: '/assets/guide/hunter_movement.png'
         }
       ]
     },
     {
       id: 'commander',
-      name: 'OVERLORD',
-      title: 'The Corrupted Champion',
+      name: t('guide.enemies.commander.name'),
+      title: t('guide.enemies.commander.title'),
       type: 'strong',
       image: '/assets/sprites/enemy_strong.png',
-      hp: 'Very High',
-      speed: 'Slow',
-      damage: 'Very High',
-      description: 'Massive hulking brutes that shield allies and unleash devastating charged laser attacks.',
-      lore: `The Overlords were once the arena's greatest champions - warriors who won a hundred battles and earned the right to retire in glory. The corruption found them in their peaceful retirement and twisted their legendary strength into something monstrous.
-
-Their hulking green bodies are covered in battle scars and corruption boils. The gas mask fused to their faces pumps corrupted air directly into their lungs, keeping them in a permanent state of rage. Despite their size, they retain the combat instincts that made them champions.
-
-The most terrifying aspect of the Overlords is their protective nature. Even corrupted, they remember their duty to protect the weak. Now they extend that protection to other corrupted, projecting shields that make nearby enemies invulnerable. The only way to break this protection is to destroy the Overlord itself.
-
-When wounded, an Overlord enters what survivors call "Berserker Mode" - a state of pure fury where all restraint is abandoned. Their eyes glow red, their movements become frantic, and their attacks come with terrifying speed. Many survivors have celebrated wounding an Overlord, only to be immediately destroyed by its berserk retaliation.`,
+      hp: t('guide.enemies.commander.hp'),
+      speed: t('guide.enemies.commander.speed'),
+      damage: t('guide.enemies.commander.damage'),
+      description: t('guide.enemies.commander.description'),
+      lore: t('guide.enemies.commander.lore'),
       abilities: [
         {
-          name: 'Shield Aura',
-          description: 'Projects an invulnerability field to all nearby allies.',
-          details: 'All enemies within range of an Overlord become COMPLETELY INVULNERABLE to all damage. Protected enemies display a cyan shield glow and connecting lines to the Overlord. The ONLY way to damage shielded enemies is to kill the Overlord first. Multiple Overlords can stack their protection ranges.',
+          name: t('guide.enemies.commander.abilities.0.name'),
+          description: t('guide.enemies.commander.abilities.0.description'),
+          details: t('guide.enemies.commander.abilities.0.details'),
           image: '/assets/guide/overlord_shield.png'
         },
         {
-          name: 'Charged Laser',
-          description: 'Charges up and fires an unstoppable beam of destruction.',
-          details: 'After a charge period (indicated by orange pulsing and a targeting laser line), the Overlord fires a massive projectile. This projectile CANNOT BE DESTROYED by player weapons - it will pass through everything. The targeting line shows exactly where it will fire, giving you time to move out of the way.',
+          name: t('guide.enemies.commander.abilities.1.name'),
+          description: t('guide.enemies.commander.abilities.1.description'),
+          details: t('guide.enemies.commander.abilities.1.details'),
           image: '/assets/guide/overlord_laser.png'
         },
         {
-          name: 'Berserker Rage',
-          description: 'Enters a frenzy at low health, becoming exponentially more dangerous.',
-          details: 'When health drops low, the Overlord transforms. Size increases, movement speed increases dramatically, attack cooldowns decrease significantly, and charge time for the laser is reduced. A blood-red glow and roar signal this transformation. Many survivors die to Berserker Overlords they thought they had beaten.',
+          name: t('guide.enemies.commander.abilities.2.name'),
+          description: t('guide.enemies.commander.abilities.2.description'),
+          details: t('guide.enemies.commander.abilities.2.details'),
           image: '/assets/guide/overlord_berserk.png'
         }
       ]
@@ -154,38 +138,18 @@ When wounded, an Overlord enters what survivors call "Berserker Mode" - a state 
   const loreEntries = [
     {
       id: 'arena',
-      title: 'THE ARENA',
-      content: `The ONE Arena was not always a place of death. A thousand years ago, it stood as the Grand Colosseum of the Kingdom of Valdris - a place where warriors tested their skill in honorable combat, where champions were crowned, and where the people gathered to celebrate their heroes.
-
-The arena's construction took fifty years and the labor of ten thousand craftsmen. Its stones were quarried from the Sacred Mountains, blessed by priests, and laid with precision that modern architects cannot replicate. The floor was designed to be infinitely expandable - a feat of magical engineering that allowed the arena to grow or shrink based on the nature of the contest.
-
-When the Dark Corruption emerged from the depths, the arena became humanity's last stronghold. For three years, the greatest warriors held the line here, protecting the civilians who sheltered in the underground chambers. But even heroes fall.
-
-Now the arena serves a darker purpose. The corruption uses it as a hunting ground, drawing in survivors with promises of glory and treasure. Those who enter find themselves trapped in an ever-expanding nightmare, fighting endless waves of the corrupted until they either escape... or join the horde.`
+      title: t('guide.loreEntries.arena.title'),
+      content: t('guide.loreEntries.arena.content')
     },
     {
       id: 'corruption',
-      title: 'THE CORRUPTION',
-      content: `No one knows where the Dark Corruption came from. Some say it seeped up from the world's core, a primordial evil that predates humanity. Others believe it was summoned by a mad sorcerer seeking immortality. The truth may be lost forever.
-
-What is known is its effect: the corruption transforms living beings into mindless servants of destruction. It doesn't kill - it converts. The victim's body is preserved, enhanced even, but their soul is consumed. What remains is a hollow shell driven by an insatiable hunger for violence.
-
-The corruption spreads through contact, through wounds, through prolonged exposure to corrupted areas. The arena is so saturated with dark energy that simply breathing the air begins the transformation. Only those with exceptional willpower - or exceptional weapons - can resist its influence.
-
-Scholars who studied the corruption discovered that it has a hive-like intelligence. The corrupted share a collective consciousness, coordinating their attacks with supernatural precision. When you fight one, you fight them all.`
+      title: t('guide.loreEntries.corruption.title'),
+      content: t('guide.loreEntries.corruption.content')
     },
     {
       id: 'survivor',
-      title: 'THE SURVIVOR',
-      content: `You are not the first to enter the arena. Thousands have come before you - warriors, mages, desperate civilians with nothing left to lose. Most became part of the horde within hours.
-
-But you are different.
-
-Perhaps it's the weapons you carry, forged with ancient techniques that resist corruption. Perhaps it's your iron will, honed through years of hardship. Or perhaps you carry a spark of something the corruption cannot touch - hope.
-
-The abilities you discover in the arena are not random. They are gifts from the fallen champions, fragments of their power that recognize a worthy successor. Each ability you claim is a piece of history, a legacy of heroism passed down to you.
-
-Your mission is simple: survive. But as you progress deeper into the arena, you'll discover that survival is just the beginning. The corruption has a source. The horde has a master. And somewhere in the endless waves of enemies, there's a path to ending this nightmare once and for all.`
+      title: t('guide.loreEntries.survivor.title'),
+      content: t('guide.loreEntries.survivor.content')
     }
   ];
 
@@ -270,10 +234,10 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
               className="border-4 border-white py-3 px-8 text-white font-bold hover:bg-red-800 transition-all"
               style={{ fontSize: '18px', backgroundColor: '#5a0000' }}
             >
-              ← BACK
+              {t('back')}
             </button>
             <h1 className="text-white font-bold" style={{ fontSize: '32px', textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}>
-              ENCYCLOPEDIA
+              {t('guide.encyclopedia')}
             </h1>
           </div>
           
@@ -286,7 +250,7 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                 className={`px-5 py-2 font-bold border-4 border-white transition-all tab-button ${activeCategory === cat ? 'active' : ''}`}
                 style={{ fontSize: '16px' }}
               >
-                {cat.toUpperCase()}
+                {t(`guide.tabs.${cat}`)}
               </button>
             ))}
           </div>
@@ -301,7 +265,7 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
               {/* Left Sidebar */}
               <div className="w-80 border-r-4 border-white overflow-y-auto guide-sidebar" style={{ backgroundColor: 'rgba(26, 0, 0, 0.9)' }}>
                 <div className="p-4">
-                  <h2 className="text-gray-300 font-bold mb-4 pb-2 border-b-2 border-gray-700" style={{ fontSize: '16px' }}>SELECT ENEMY</h2>
+                  <h2 className="text-gray-300 font-bold mb-4 pb-2 border-b-2 border-gray-700" style={{ fontSize: '16px' }}>{t('guide.selectEnemy')}</h2>
                   {enemies.map((enemy) => {
                     const colors = getTypeColor(enemy.type);
                     return (
@@ -331,7 +295,7 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                   {/* Coming Soon Message */}
                   <div className="border-4 border-yellow-900/50 p-4 mt-4" style={{ backgroundColor: 'rgba(90, 60, 0, 0.2)' }}>
                     <p className="text-yellow-300 text-center font-bold" style={{ fontSize: '14px' }}>
-                      EXPECT MORE ENEMY TYPES SOON
+                      {t('guide.moreEnemiesSoon')}
                     </p>
                   </div>
                 </div>
@@ -366,7 +330,7 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                               color: getTypeColor(selectedEnemyData.type).text
                             }}
                           >
-                            {selectedEnemyData.type.toUpperCase()}
+                            {t(`guide.types.${selectedEnemyData.type}`)}
                           </span>
                         </div>
                         <div className="text-gray-400 italic mb-3" style={{ fontSize: '16px' }}>"{selectedEnemyData.title}"</div>
@@ -375,15 +339,15 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                         {/* Stats */}
                         <div className="flex gap-4">
                           <div className="border-2 border-red-900 px-4 py-2" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                            <span className="text-red-400" style={{ fontSize: '12px' }}>HP</span>
+                            <span className="text-red-400" style={{ fontSize: '12px' }}>{t('guide.stats.hp')}</span>
                             <span className="text-white font-bold ml-2" style={{ fontSize: '16px' }}>{selectedEnemyData.hp}</span>
                           </div>
                           <div className="border-2 border-blue-900 px-4 py-2" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                            <span className="text-blue-400" style={{ fontSize: '12px' }}>SPEED</span>
+                            <span className="text-blue-400" style={{ fontSize: '12px' }}>{t('guide.stats.speed')}</span>
                             <span className="text-white font-bold ml-2" style={{ fontSize: '16px' }}>{selectedEnemyData.speed}</span>
                           </div>
                           <div className="border-2 border-orange-900 px-4 py-2" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                            <span className="text-orange-400" style={{ fontSize: '12px' }}>DMG</span>
+                            <span className="text-orange-400" style={{ fontSize: '12px' }}>{t('guide.stats.dmg')}</span>
                             <span className="text-white font-bold ml-2" style={{ fontSize: '16px' }}>{selectedEnemyData.damage}</span>
                           </div>
                         </div>
@@ -393,7 +357,7 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                     {/* Abilities Section */}
                     <div className="mb-6">
                       <h3 className="text-yellow-500 font-bold mb-4 flex items-center gap-2" style={{ fontSize: '22px' }}>
-                        <PixelIcon name="star" size={24} /> ABILITIES
+                        <PixelIcon name="star" size={24} /> {t('guide.abilities')}
                       </h3>
                       <div className="space-y-4">
                         {selectedEnemyData.abilities.map((ability, idx) => (
@@ -408,7 +372,7 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
                                     target.style.display = 'none';
-                                    target.parentElement!.innerHTML = '<div class="text-gray-600 text-center" style="font-size: 11px; padding: 4px;">SCREENSHOT</div>';
+                                    target.parentElement!.innerHTML = `<div class="text-gray-600 text-center" style="font-size: 11px; padding: 4px;">${t('guide.screenshot')}</div>`;
                                   }}
                                 />
                               </div>
@@ -426,7 +390,7 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                     {/* Lore Section */}
                     <div>
                       <h3 className="text-purple-400 font-bold mb-4 flex items-center gap-2" style={{ fontSize: '22px' }}>
-                        <PixelIcon name="heart" size={24} /> LORE
+                        <PixelIcon name="heart" size={24} /> {t('guide.lore')}
                       </h3>
                       <div className="border-4 border-purple-900 p-5" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <p className="text-gray-300 whitespace-pre-line" style={{ fontSize: '15px', lineHeight: '1.6' }}>{selectedEnemyData.lore}</p>
@@ -447,26 +411,26 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                   <div className="w-44 h-44 shrink-0 border-4 border-cyan-500 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
                     <img 
                       src="/assets/sprites/player.png" 
-                      alt="The Survivor"
+                      alt={t('guide.hero.title')}
                       className="w-36 h-36 object-contain"
                       style={{ imageRendering: 'pixelated' }}
                     />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-cyan-400 font-bold mb-2" style={{ fontSize: '32px' }}>THE SURVIVOR</h2>
-                    <div className="text-gray-400 italic mb-3" style={{ fontSize: '16px' }}>"Last Hope of Valdris"</div>
+                    <h2 className="text-cyan-400 font-bold mb-2" style={{ fontSize: '32px' }}>{t('guide.hero.title')}</h2>
+                    <div className="text-gray-400 italic mb-3" style={{ fontSize: '16px' }}>"{t('guide.hero.subtitle')}"</div>
                     <p className="text-gray-300 mb-4" style={{ fontSize: '16px' }}>
-                      You are the chosen one - a warrior who resists the corruption through sheer willpower and ancient weaponry. Armed with weapons blessed by the old gods and abilities inherited from fallen champions, you alone stand against the endless horde.
+                      {t('guide.hero.description')}
                     </p>
                     
                     <div className="flex gap-4 flex-wrap">
                       <div className="border-2 border-cyan-700 px-4 py-2" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                        <span className="text-cyan-400" style={{ fontSize: '12px' }}>CLASS</span>
-                        <span className="text-white font-bold ml-2" style={{ fontSize: '16px' }}>Human Champion</span>
+                        <span className="text-cyan-400" style={{ fontSize: '12px' }}>{t('guide.hero.class')}</span>
+                        <span className="text-white font-bold ml-2" style={{ fontSize: '16px' }}>{t('guide.hero.classValue')}</span>
                       </div>
                       <div className="border-2 border-cyan-700 px-4 py-2" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                        <span className="text-cyan-400" style={{ fontSize: '12px' }}>SPECIALTY</span>
-                        <span className="text-white font-bold ml-2" style={{ fontSize: '16px' }}>Adaptive Combat</span>
+                        <span className="text-cyan-400" style={{ fontSize: '12px' }}>{t('guide.hero.specialty')}</span>
+                        <span className="text-white font-bold ml-2" style={{ fontSize: '16px' }}>{t('guide.hero.specialtyValue')}</span>
                       </div>
                     </div>
                   </div>
@@ -475,16 +439,16 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                 {/* Controls */}
                 <div className="mb-6">
                   <h3 className="text-white font-bold mb-4 flex items-center gap-2" style={{ fontSize: '22px' }}>
-                    <PixelIcon name="bolt" size={24} /> CONTROLS
+                    <PixelIcon name="bolt" size={24} /> {t('controls')}
                   </h3>
                   <div className="grid grid-cols-3 gap-4">
                     {[
-                      { key: 'WASD', action: 'Movement' },
-                      { key: 'MOUSE', action: 'Aim' },
-                      { key: 'L-CLICK', action: 'Attack' },
-                      { key: '1-5', action: 'Abilities' },
-                      { key: 'E', action: 'Interact' },
-                      { key: 'ESC', action: 'Pause' },
+                      { key: 'WASD', action: t('guide.controls.movement') },
+                      { key: 'MOUSE', action: t('guide.controls.aim') },
+                      { key: 'L-CLICK', action: t('guide.controls.attack') },
+                      { key: '1-5', action: t('guide.controls.abilities') },
+                      { key: 'E', action: t('guide.controls.interact') },
+                      { key: 'ESC', action: t('guide.controls.pause') },
                     ].map((control, idx) => (
                       <div key={idx} className="border-4 border-gray-700 p-4 text-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
                         <div className="text-yellow-400 font-bold" style={{ fontSize: '18px' }}>{control.key}</div>
@@ -498,7 +462,7 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                 <div className="mb-6">
                   <div className="border-4 border-yellow-900/50 p-4" style={{ backgroundColor: 'rgba(90, 60, 0, 0.2)' }}>
                     <p className="text-yellow-300 text-center font-bold" style={{ fontSize: '16px' }}>
-                      EXPECT MORE WEAPONS SOON
+                      {t('guide.moreWeaponsSoon')}
                     </p>
                   </div>
                 </div>
@@ -506,17 +470,19 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                 {/* Backstory */}
                 <div>
                   <h3 className="text-purple-400 font-bold mb-4 flex items-center gap-2" style={{ fontSize: '22px' }}>
-                    <PixelIcon name="heart" size={24} /> YOUR STORY
+                    <PixelIcon name="heart" size={24} /> {t('guide.hero.storyTitle')}
                   </h3>
                   <div className="border-4 border-purple-900 p-5" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
                     <p className="text-gray-300" style={{ fontSize: '15px', lineHeight: '1.6' }}>
-                      You awoke in the arena with no memory of how you arrived. The last thing you remember is a blinding light, a voice calling your name, and then... darkness.
-                      <br /><br />
-                      Now you fight. Not just for survival, but for answers. Who brought you here? Why can you resist the corruption when so many others have fallen? And what is the source of the power that courses through your veins every time you claim a new ability?
-                      <br /><br />
-                      The corrupted fear you. You can see it in the way they hesitate, in the way the Overlords' eyes flicker with something almost like recognition. They know something about you - something even you don't know.
-                      <br /><br />
-                      <span className="text-cyan-400 font-bold">Your destiny is not to merely survive. It is to end this nightmare once and for all.</span>
+                      <Trans i18nKey="guide.hero.storyContent">
+                        You awoke in the arena with no memory of how you arrived. The last thing you remember is a blinding light, a voice calling your name, and then... darkness.
+                        <br /><br />
+                        Now you fight. Not just for survival, but for answers. Who brought you here? Why can you resist the corruption when so many others have fallen? And what is the source of the power that courses through your veins every time you claim a new ability?
+                        <br /><br />
+                        The corrupted fear you. You can see it in the way they hesitate, in the way the Overlords' eyes flicker with something almost like recognition. They know something about you - something even you don't know.
+                        <br /><br />
+                        <span className="text-cyan-400 font-bold">Your destiny is not to merely survive. It is to end this nightmare once and for all.</span>
+                      </Trans>
                     </p>
                   </div>
                 </div>
@@ -530,7 +496,7 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
               {/* Left Sidebar */}
               <div className="w-80 border-r-4 border-white overflow-y-auto guide-sidebar" style={{ backgroundColor: 'rgba(26, 0, 0, 0.9)' }}>
                 <div className="p-4">
-                  <h2 className="text-gray-300 font-bold mb-4 pb-2 border-b-2 border-gray-700" style={{ fontSize: '16px' }}>SELECT ABILITY</h2>
+                  <h2 className="text-gray-300 font-bold mb-4 pb-2 border-b-2 border-gray-700" style={{ fontSize: '16px' }}>{t('guide.selectAbility')}</h2>
                   {ACTIVE_ABILITIES.map((ability) => (
                     <button
                       key={ability.type}
@@ -542,8 +508,8 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                         <PixelIcon name={ability.icon} size={28} />
                       </div>
                       <div className="text-left">
-                        <div className="font-bold text-white" style={{ fontSize: '16px' }}>{ability.name}</div>
-                        <div className="text-gray-400" style={{ fontSize: '13px' }}>{ability.duration / 1000}s duration</div>
+                        <div className="font-bold text-white" style={{ fontSize: '16px' }}>{t(`guide.activeAbilities.${ability.type}.name`)}</div>
+                        <div className="text-gray-400" style={{ fontSize: '13px' }}>{t('guide.duration', { duration: ability.duration / 1000 })}</div>
                       </div>
                     </button>
                   ))}
@@ -551,7 +517,7 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                   {/* Coming Soon Message */}
                   <div className="border-4 border-yellow-900/50 p-4 mt-4" style={{ backgroundColor: 'rgba(90, 60, 0, 0.2)' }}>
                     <p className="text-yellow-300 text-center font-bold" style={{ fontSize: '14px' }}>
-                      EXPECT MORE ABILITIES SOON
+                      {t('guide.moreAbilitiesSoon')}
                     </p>
                   </div>
                 </div>
@@ -566,16 +532,16 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
                         <PixelIcon name={selectedAbilityData.icon} size={64} />
                       </div>
                       <div className="flex-1">
-                        <h2 className="text-yellow-400 font-bold mb-2" style={{ fontSize: '32px' }}>{selectedAbilityData.name.toUpperCase()}</h2>
-                        <p className="text-gray-300 mb-4" style={{ fontSize: '16px' }}>{selectedAbilityData.description}</p>
+                        <h2 className="text-yellow-400 font-bold mb-2" style={{ fontSize: '32px' }}>{t(`guide.activeAbilities.${selectedAbilityData.type}.name`).toUpperCase()}</h2>
+                        <p className="text-gray-300 mb-4" style={{ fontSize: '16px' }}>{t(`guide.activeAbilities.${selectedAbilityData.type}.description`)}</p>
                         
                         <div className="flex gap-4">
                           <div className="border-2 border-green-700 px-4 py-2" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                            <span className="text-green-400" style={{ fontSize: '12px' }}>DURATION</span>
+                            <span className="text-green-400" style={{ fontSize: '12px' }}>{t('guide.durationLabel')}</span>
                             <span className="text-white font-bold ml-2" style={{ fontSize: '18px' }}>{selectedAbilityData.duration / 1000}s</span>
                           </div>
                           <div className="border-2 border-red-700 px-4 py-2" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                            <span className="text-red-400" style={{ fontSize: '12px' }}>COOLDOWN</span>
+                            <span className="text-red-400" style={{ fontSize: '12px' }}>{t('guide.cooldownLabel')}</span>
                             <span className="text-white font-bold ml-2" style={{ fontSize: '18px' }}>{selectedAbilityData.cooldown / 1000}s</span>
                           </div>
                         </div>
@@ -584,66 +550,52 @@ Your mission is simple: survive. But as you progress deeper into the arena, you'
 
                     {/* How It Works */}
                     <div className="border-4 border-gray-700 p-5 mb-5" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                      <h3 className="text-white font-bold mb-3" style={{ fontSize: '20px' }}>HOW IT WORKS</h3>
+                      <h3 className="text-white font-bold mb-3" style={{ fontSize: '20px' }}>{t('guide.howItWorks')}</h3>
                       <p className="text-gray-300" style={{ fontSize: '15px', lineHeight: '1.6' }}>
-                        {selectedAbilityData.type === 'shield' && 
-                          `The Shield ability creates an impenetrable barrier around you that absorbs ALL incoming damage. Enemy projectiles, explosions, and melee attacks are completely nullified while the shield is active. A cyan glow surrounds you, pulsing rhythmically to indicate the shield's presence. This ability is perfect for escaping overwhelming situations or pushing through enemy lines.`
-                        }
-                        {selectedAbilityData.type === 'fire_ring' && 
-                          `The Fire Ring summons a blazing circle of flame around you. Any enemy that enters this zone takes continuous damage and is marked with a burning effect. The ring rotates visually and emits fire particles along its perimeter. Enemies caught in the fire glow orange, making them easy to track. This ability excels at crowd control and area denial.`
-                        }
-                        {selectedAbilityData.type === 'speed_boost' && 
-                          `Speed Boost increases your movement speed by 50%, allowing you to outrun most enemies in the arena. Cyan speed lines appear around your character to indicate the boost is active. This ability is invaluable for repositioning, escaping dangerous situations, or kiting enemies while your weapons are on cooldown.`
-                        }
-                        {selectedAbilityData.type === 'damage_boost' && 
-                          `Damage Boost triples ALL damage you deal for its duration. Your character gains a red glow to indicate the power surge. This ability transforms even basic weapons into devastating tools of destruction. Best used when you have clear shots at high-value targets.`
-                        }
-                        {selectedAbilityData.type === 'freeze' && 
-                          `Freeze slows ALL enemies on the screen significantly, giving you a tactical advantage. Ice particles orbit around you while this ability is active, and affected enemies move visibly slower. This ability affects everything - movement speed, attack speed, and projectile speed.`
-                        }
+                        {t(`guide.activeAbilities.${selectedAbilityData.type}.details`)}
                       </p>
                     </div>
 
                     {/* Tips */}
                     <div className="border-4 border-yellow-900 p-5" style={{ backgroundColor: 'rgba(90, 60, 0, 0.3)' }}>
                       <h3 className="text-yellow-400 font-bold mb-3 flex items-center gap-2" style={{ fontSize: '20px' }}>
-                        <PixelIcon name="bolt" size={20} /> PRO TIPS
+                        <PixelIcon name="bolt" size={20} /> {t('guide.proTips')}
                       </h3>
                       <ul className="text-gray-300 space-y-2" style={{ fontSize: '15px' }}>
                         {selectedAbilityData.type === 'shield' && (
-                          <>
+                          <Trans i18nKey="guide.activeAbilities.shield.tips">
                             <li>• Use Shield to safely collect health pickups in dangerous areas</li>
                             <li>• Activate when an Overlord begins charging to nullify their attack</li>
                             <li>• Don't waste it on small groups - save it for emergencies</li>
-                          </>
+                          </Trans>
                         )}
                         {selectedAbilityData.type === 'fire_ring' && (
-                          <>
+                          <Trans i18nKey="guide.activeAbilities.fire_ring.tips">
                             <li>• Stand still to maximize damage - enemies walking through take repeated hits</li>
                             <li>• Combine with Freeze to trap enemies in the fire longer</li>
                             <li>• Great for clearing Swarmer waves before they can detonate</li>
-                          </>
+                          </Trans>
                         )}
                         {selectedAbilityData.type === 'speed_boost' && (
-                          <>
+                          <Trans i18nKey="guide.activeAbilities.speed_boost.tips">
                             <li>• Use to kite Overlords while their shield protects other enemies</li>
                             <li>• Perfect for repositioning when surrounded</li>
                             <li>• Can outrun even Berserker-mode Overlords</li>
-                          </>
+                          </Trans>
                         )}
                         {selectedAbilityData.type === 'damage_boost' && (
-                          <>
+                          <Trans i18nKey="guide.activeAbilities.damage_boost.tips">
                             <li>• Focus fire on Overlords to eliminate their shield aura quickly</li>
                             <li>• Devastating with shotgun or assault rifle weapons</li>
                             <li>• Time it when enemies are clustered for maximum impact</li>
-                          </>
+                          </Trans>
                         )}
                         {selectedAbilityData.type === 'freeze' && (
-                          <>
+                          <Trans i18nKey="guide.activeAbilities.freeze.tips">
                             <li>• Use to create distance when overwhelmed</li>
                             <li>• Slowed enemies are easier to hit with slow projectiles</li>
                             <li>• Combine with Fire Ring for a deadly combo</li>
-                          </>
+                          </Trans>
                         )}
                       </ul>
                     </div>

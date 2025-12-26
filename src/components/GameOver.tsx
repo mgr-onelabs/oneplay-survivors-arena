@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useOneWallet } from '../contexts/WalletContext';
 import { ACHIEVEMENTS } from '../data/achievements';
@@ -14,6 +15,7 @@ const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || '0x5f3894f6e1bb292ca51e15f
 const CLOCK_ID = import.meta.env.VITE_CLOCK_ID || '0x6';
 
 const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
+  const { t } = useTranslation();
   // Calculate survived waves: if you die during wave 1, you've survived 0 waves
   // If you die during wave 2, you've survived 1 wave, etc.
   const survivedWaves = Math.max(0, wave - 1);
@@ -132,7 +134,7 @@ const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
       
       // Check for wallet permission errors
       if (errorMessage.includes('viewAccount') || errorMessage.includes('suggestTransaction') || errorMessage.includes('permission')) {
-        setError("Your wallet is not connected properly. Please reconnect your wallet and try again.");
+        setError(t('walletConnectionError'));
       } else {
         setError(errorMessage);
       }
@@ -144,20 +146,20 @@ const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
   return (
     <div className="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 pointer-events-auto" style={{ fontFamily: "'Pixelify Sans', sans-serif" }}>
       <div className="border-4 border-white p-8 text-center shadow-2xl" style={{ backgroundColor: '#3a0000', imageRendering: 'pixelated', minWidth: '500px' }}>
-        <h2 className="text-white mb-4 font-bold" style={{ fontSize: '48px', textShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}>GAME OVER</h2>
+        <h2 className="text-white mb-4 font-bold" style={{ fontSize: '48px', textShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}>{t('gameOver')}</h2>
         <p className="text-gray-300 mb-4 font-bold" style={{ fontSize: '20px' }}>
-          YOU SURVIVED {survivedWaves} WAVE{survivedWaves !== 1 ? 'S' : ''}
+          {t('youSurvived', { count: survivedWaves })}
         </p>
 
         {/* Achievement Section */}
         {checkingAchievement && (
-          <div className="text-yellow-300 mb-4 animate-pulse text-xl font-bold">CHECKING ACHIEVEMENTS...</div>
+          <div className="text-yellow-300 mb-4 animate-pulse text-xl font-bold">{t('checkingAchievements')}</div>
         )}
 
         {newAchievement && !minted && (
           <>
             <h3 className="text-yellow-400 text-2xl mb-3 font-bold animate-pulse" style={{ textShadow: '3px 3px 0px rgba(0,0,0,0.8)' }}>
-              NEW ACHIEVEMENT UNLOCKED!
+              {t('newAchievementUnlocked')}
             </h3>
             
             <div className="flex flex-col items-center gap-3 mb-4">
@@ -184,7 +186,7 @@ const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
                 className={`mt-2 border-4 border-yellow-500 py-2 px-6 text-yellow-300 font-bold transition-all ${minting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-900 hover:text-white hover:scale-105'}`}
                 style={{ fontSize: '18px', backgroundColor: '#000000', textShadow: '2px 2px 0px rgba(0,0,0,0.5)' }}
               >
-                {minting ? 'MINTING...' : 'MINT ACHIEVEMENT NFT'}
+                {minting ? t('minting') : t('mintAchievement')}
               </button>
               {error && <div className="text-red-500 text-base font-bold mt-1">{error}</div>}
             </div>
@@ -194,9 +196,9 @@ const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
         {minted && (
            <>
              <h3 className="text-green-400 text-2xl font-bold mb-1" style={{ textShadow: '3px 3px 0px rgba(0,0,0,0.8)' }}>
-               ACHIEVEMENT MINTED!
+               {t('achievementMinted')}
              </h3>
-             <p className="text-white text-lg font-bold mb-4">Check achievements section!</p>
+             <p className="text-white text-lg font-bold mb-4">{t('checkAchievementsSection')}</p>
            </>
         )}
 
@@ -208,7 +210,7 @@ const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
             imageRendering: 'pixelated'
           }}
         >
-          RETURN TO MENU
+          {t('returnToMenu')}
         </button>
       </div>
     </div>

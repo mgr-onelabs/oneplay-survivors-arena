@@ -15,9 +15,13 @@
     "@onelabs/sui": "^1.26.2",
     "@supabase/supabase-js": "^2.57.4",
     "gifler": "^0.1.0",
+    "i18next": "^25.7.3",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "i18next-http-backend": "^3.0.2",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-i18next": "^16.5.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Weapon } from '../types/game';
 import { spriteManager } from '../utils/spriteManager';
 import { useEffect, useRef } from 'react';
@@ -10,6 +11,7 @@ interface WeaponModalProps {
 }
 
 const WeaponModal = ({ weapon, onConfirm, onClose }: WeaponModalProps) => {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -92,21 +94,21 @@ const WeaponModal = ({ weapon, onConfirm, onClose }: WeaponModalProps) => {
 
         <div className="text-white mb-4" style={{ fontSize: '16px' }}>
           <div className="mb-2">
-            <span className="text-gray-300">DAMAGE:</span> <span className="text-yellow-300 ml-2">{weapon.baseDamage}</span>
+            <span className="text-gray-300">{t('damage')}:</span> <span className="text-yellow-300 ml-2">{weapon.baseDamage}</span>
           </div>
           <div className="mb-2">
-            <span className="text-gray-300">FIRERATE:</span> <span className="text-yellow-300 ml-2">{calculateFirerate(weapon.cooldown).toFixed(5)}</span>
+            <span className="text-gray-300">{t('firerate')}:</span> <span className="text-yellow-300 ml-2">{calculateFirerate(weapon.cooldown).toFixed(5)}</span>
           </div>
           {weapon.range && (
             <div className="mb-2">
-              <span className="text-gray-300">RANGE:</span> <span className="text-yellow-300 ml-2">{weapon.range}</span>
+              <span className="text-gray-300">{t('range')}:</span> <span className="text-yellow-300 ml-2">{weapon.range}</span>
             </div>
           )}
           <div className="mt-3 text-yellow-300 font-bold text-center" style={{ fontSize: '12px', fontFamily: 'monospace' }}>
             {weapon.id?.startsWith('default-') 
-              ? '[DEFAULT WEAPON]' 
+              ? t('defaultWeapon') 
               : weapon.id 
-                ? `NFT: ${weapon.id.slice(0, 6)}...${weapon.id.slice(-4)}`
+                ? t('nftIdShort', { nftId: `${weapon.id.slice(0, 6)}...${weapon.id.slice(-4)}` })
                 : ''}
           </div>
         </div>
@@ -117,14 +119,14 @@ const WeaponModal = ({ weapon, onConfirm, onClose }: WeaponModalProps) => {
             className="bg-gray-700 hover:bg-gray-600 text-white border-4 border-white py-3 px-6 transition-all"
             style={{ fontSize: '14px', imageRendering: 'pixelated' }}
           >
-            CANCEL
+            {t('cancel')}
           </button>
           <button
             onClick={onConfirm}
             className="bg-green-700 hover:bg-green-600 text-white border-4 border-white py-3 px-6 transition-all"
             style={{ fontSize: '14px', imageRendering: 'pixelated' }}
           >
-            CONFIRM
+            {t('confirm')}
           </button>
         </div>
       </div>

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface WalletWarningModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -5,6 +7,7 @@ interface WalletWarningModalProps {
 }
 
 const WalletWarningModal = ({ isOpen, onClose, onConnect }: WalletWarningModalProps) => {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   return (
@@ -21,11 +24,11 @@ const WalletWarningModal = ({ isOpen, onClose, onConnect }: WalletWarningModalPr
           className="text-white text-2xl font-bold mb-4 text-center"
           style={{ imageRendering: 'pixelated' }}
         >
-          WALLET REQUIRED
+          {t('walletRequired')}
         </h2>
         
         <p className="text-white text-lg mb-6 text-center">
-          Please connect your OneChain wallet before proceeding.
+          {t('connectWalletMessage')}
         </p>
         
         <div className="flex gap-4 justify-center">
@@ -34,7 +37,7 @@ const WalletWarningModal = ({ isOpen, onClose, onConnect }: WalletWarningModalPr
             className="border-2 border-white py-2 px-6 text-white font-bold transition-all bg-gray-800 hover:bg-gray-700"
             style={{ fontSize: '16px', imageRendering: 'pixelated' }}
           >
-            CANCEL
+            {t('cancel')}
           </button>
           <button
             onClick={() => {
@@ -44,7 +47,7 @@ const WalletWarningModal = ({ isOpen, onClose, onConnect }: WalletWarningModalPr
             className="border-2 border-white py-2 px-6 text-white font-bold transition-all bg-red-800 hover:bg-red-700"
             style={{ fontSize: '16px', imageRendering: 'pixelated' }}
           >
-            CONNECT WALLET
+            {t('connectWallet')}
           </button>
         </div>
       </div>

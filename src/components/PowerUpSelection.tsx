@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import { PowerUp } from '../types/game';
 import { PixelIcon } from '../utils/pixelIcons';
@@ -9,6 +10,7 @@ interface PowerUpSelectionProps {
 }
 
 const PowerUpSelection = ({ powerUps, onSelectPowerUp, wave }: PowerUpSelectionProps) => {
+  const { t } = useTranslation();
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       // Only handle if modal is visible (prevent conflicts with other key handlers)
@@ -64,8 +66,8 @@ const PowerUpSelection = ({ powerUps, onSelectPowerUp, wave }: PowerUpSelectionP
       <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50" style={{ fontFamily: "'Pixelify Sans', sans-serif" }}>
       <div className="border-4 border-white p-12 max-w-6xl shadow-2xl" style={{ backgroundColor: '#3a0000', imageRendering: 'pixelated' }}>
         <div className="text-center mb-8">
-          <h2 className="text-white mb-4 font-bold" style={{ fontSize: '48px', textShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}>LEVEL UP!</h2>
-          <p className="text-yellow-300 font-bold" style={{ fontSize: '24px' }}>WAVE {wave} COMPLETE</p>
+          <h2 className="text-white mb-4 font-bold" style={{ fontSize: '48px', textShadow: '4px 4px 0px rgba(0,0,0,0.5)' }}>{t('levelUp')}</h2>
+          <p className="text-yellow-300 font-bold" style={{ fontSize: '24px' }}>{t('waveComplete', { wave })}</p>
         </div>
 
         <div className="flex gap-6 justify-center flex-wrap">
@@ -86,13 +88,13 @@ const PowerUpSelection = ({ powerUps, onSelectPowerUp, wave }: PowerUpSelectionP
                   [{index + 1}]
                 </div>
               </div>
-              <h3 className="text-white mb-4 font-bold text-center" style={{ fontSize: '18px' }}>{powerUp.name.toUpperCase()}</h3>
-              <p className="text-cyan-300 font-bold text-center" style={{ fontSize: '14px', lineHeight: '1.5' }}>{powerUp.description.toUpperCase()}</p>
+              <h3 className="text-white mb-4 font-bold text-center" style={{ fontSize: '18px' }}>{t(powerUp.name).toUpperCase()}</h3>
+              <p className="text-cyan-300 font-bold text-center" style={{ fontSize: '14px', lineHeight: '1.5' }}>{t(powerUp.description).toUpperCase()}</p>
             </button>
           ))}
         </div>
 
-        <p className="text-white text-center mt-8 font-bold" style={{ fontSize: '20px' }}>PRESS <span className="text-yellow-300">1</span>, <span className="text-yellow-300">2</span>, OR <span className="text-yellow-300">3</span> TO SELECT</p>
+        <p className="text-white text-center mt-8 font-bold" style={{ fontSize: '20px' }}>{t('pressToSelect')}</p>
       </div>
     </div>
     </>

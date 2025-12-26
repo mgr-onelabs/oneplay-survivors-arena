@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef } from 'react';
 import { Weapon } from '../types/game';
 import { getRarityColor, getRarityBorderColor, calculateFirerate } from '../data/weapons';
@@ -12,6 +13,7 @@ interface InventoryProps {
 }
 
 const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
+  const { t } = useTranslation();
   const { executeTransaction } = useOneWallet();
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(playerInventory[0] || null);
   const [spritesLoaded, setSpritesLoaded] = useState(false);
@@ -47,7 +49,7 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
       
       // Check for wallet permission errors
       if (errorMessage.includes('viewAccount') || errorMessage.includes('suggestTransaction') || errorMessage.includes('permission')) {
-        setTransferError("Your wallet is not connected properly. Please reconnect your wallet and try again.");
+        setTransferError(t('walletConnectionError'));
       } else {
         setTransferError(errorMessage);
       }
@@ -149,12 +151,12 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
             zIndex: 20
           }}
         >
-          ← BACK
+          {t('back')}
         </button>
 
         {/* Left side - Weapon list */}
         <div className="w-1/3 p-8 pt-20 border-r-4 border-white overflow-y-auto flex-shrink-0 relative weapons-scrollable" style={{ zIndex: 10 }}>
-          <h1 className="text-white mb-8 text-center font-bold" style={{ fontSize: '32px' }}>INVENTORY</h1>
+          <h1 className="text-white mb-8 text-center font-bold" style={{ fontSize: '32px' }}>{t('inventory')}</h1>
 
           <div className="flex flex-col gap-4">
             {playerInventory.map((weapon) => {
@@ -185,7 +187,7 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
           
           {loading && (
             <div className="text-yellow-300 text-center mt-4 font-bold text-xl animate-pulse">
-              LOADING INVENTORY...
+              {t('loadingInventory')}
             </div>
           )}
         </div>
@@ -202,9 +204,9 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
                 <div className="inline-block bg-black/60 border-2 border-yellow-500/50 px-4 py-2 rounded max-w-full overflow-hidden">
                   <div className="text-yellow-300 text-xs font-bold font-mono whitespace-nowrap overflow-x-auto scrollbar-hide" style={{ textShadow: '1px 1px 0px rgba(0,0,0,0.8)' }}>
                     {selectedWeapon.id?.startsWith('default-') 
-                      ? '[DEFAULT WEAPON]' 
+                      ? t('defaultWeapon') 
                       : selectedWeapon.id 
-                        ? `NFT ID: ${selectedWeapon.id}`
+                        ? t('nftId', { nftId: selectedWeapon.id })
                         : ''}
                   </div>
                 </div>
@@ -235,7 +237,7 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
                     className="bg-[#8b0000] hover:bg-[#a00000] text-white font-bold py-2 px-4 border-2 border-[#ff0000] shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)] hover:shadow-none transition-all h-[38px] flex items-center"
                     style={{ fontSize: '14px', imageRendering: 'pixelated' }}
                   >
-                    TRANSFER
+                    {t('transfer')}
                   </button>
                 )}
               </div>
@@ -251,14 +253,14 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
 
               <div className="text-white w-full px-4" style={{ fontSize: '18px' }}>
                 <div className="mb-3 p-3 border-4 border-white" style={{ backgroundColor: '#3a0000' }}>
-                  <span className="text-gray-300">DAMAGE:</span> <span className="text-yellow-300 ml-2 font-bold">{selectedWeapon.baseDamage}</span>
+                  <span className="text-gray-300">{t('damage')}:</span> <span className="text-yellow-300 ml-2 font-bold">{selectedWeapon.baseDamage}</span>
                 </div>
                 <div className="mb-3 p-3 border-4 border-white" style={{ backgroundColor: '#3a0000' }}>
-                  <span className="text-gray-300">FIRERATE:</span> <span className="text-yellow-300 ml-2 font-bold">{calculateFirerate(selectedWeapon.cooldown).toFixed(5)}</span>
+                  <span className="text-gray-300">{t('firerate')}:</span> <span className="text-yellow-300 ml-2 font-bold">{calculateFirerate(selectedWeapon.cooldown).toFixed(5)}</span>
                 </div>
                 {selectedWeapon.range && (
                   <div className="mb-3 p-3 border-4 border-white" style={{ backgroundColor: '#3a0000' }}>
-                    <span className="text-gray-300">RANGE:</span> <span className="text-yellow-300 ml-2 font-bold">{selectedWeapon.range}</span>
+                    <span className="text-gray-300">{t('range')}:</span> <span className="text-yellow-300 ml-2 font-bold">{selectedWeapon.range}</span>
                   </div>
                 )}
                 <div className="mt-4 p-3 border-4 border-white" style={{ backgroundColor: '#3a0000' }}>
@@ -270,7 +272,7 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
             </>
           ) : (
             <div className="text-gray-400 text-center" style={{ fontSize: '24px' }}>
-              SELECT A WEAPON TO VIEW DETAILS
+              {t('selectWeaponToViewDetails')}
             </div>
           )}
         </div>
@@ -280,28 +282,28 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
       {showTransferModal && (
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 font-['Pixelify_Sans']">
           <div className="bg-[#3a0000] border-4 border-white p-8 max-w-md w-full mx-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.5)]" style={{ imageRendering: 'pixelated' }}>
-            <h3 className="text-white text-3xl font-bold mb-6 text-center border-b-4 border-white pb-4">TRANSFER NFT</h3>
+            <h3 className="text-white text-3xl font-bold mb-6 text-center border-b-4 border-white pb-4">{t('transferNft')}</h3>
             
             {transferSuccess ? (
               <div className="text-center py-4">
-                <div className="text-green-400 text-2xl mb-4 font-bold">TRANSFER SUCCESSFUL!</div>
-                <p className="text-white text-lg mb-6">The weapon has been sent to the recipient.</p>
+                <div className="text-green-400 text-2xl mb-4 font-bold">{t('transferSuccessful')}</div>
+                <p className="text-white text-lg mb-6">{t('weaponSent')}</p>
               </div>
             ) : (
               <>
                 <p className="text-white mb-6 text-lg text-center">
-                  Enter the recipient's OneChain address below. 
+                  {t('enterRecipientAddress')} 
                   <br/>
-                  <span className="text-[#ff5555] font-bold mt-2 block">WARNING: THIS ACTION CANNOT BE UNDONE!</span>
+                  <span className="text-[#ff5555] font-bold mt-2 block">{t('warningCannotBeUndone')}</span>
                 </p>
                 
                 <div className="mb-8">
-                  <label className="block text-white text-lg font-bold mb-2">RECIPIENT ADDRESS</label>
+                  <label className="block text-white text-lg font-bold mb-2">{t('recipientAddress')}</label>
                   <input
                     type="text"
                     value={recipientAddress}
                     onChange={(e) => setRecipientAddress(e.target.value)}
-                    placeholder="0x..."
+                    placeholder={t('addressPlaceholder')}
                     className="w-full bg-black border-4 border-white text-white p-4 focus:border-yellow-400 outline-none font-mono text-lg placeholder-gray-600"
                   />
                 </div>
@@ -319,7 +321,7 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
                     disabled={isTransferring}
                     style={{ fontSize: '18px' }}
                   >
-                    CANCEL
+                    {t('cancel')}
                   </button>
                   <button
                     onClick={handleTransfer}
@@ -327,7 +329,7 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
                     className="bg-green-700 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-8 border-4 border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] hover:translate-y-1 hover:shadow-none transition-all"
                     style={{ fontSize: '18px' }}
                   >
-                    {isTransferring ? 'SENDING...' : 'CONFIRM'}
+                    {isTransferring ? t('sending') : t('confirm')}
                   </button>
                 </div>
               </>

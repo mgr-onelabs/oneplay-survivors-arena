@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef } from 'react';
 import { Weapon, WeaponType, WeaponRarity } from '../types/game';
 import { getRarityColor, getRarityBorderColor, calculateFirerate } from '../data/weapons';
@@ -22,6 +23,7 @@ const REGISTRY_ID = import.meta.env.VITE_REGISTRY_ID || '0x5e7dfc8015b51e6f666c4
 const WEAPON_NFT_TYPE = `${PACKAGE_ID}::weapon_nft::WeaponNFT`;
 const WEAPON_MINTED = `${PACKAGE_ID}::weapon_nft::WeaponMinted`;
 const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
+  const { t } = useTranslation();
   const { connected, address, client, signTransaction, executeTransaction, isWalletInstalled } = useOneWallet();
   const [canOpen, setCanOpen] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
@@ -120,7 +122,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
   useEffect(() => {
     if (!connected || !address || !client) {
       setCanOpen(false);
-      setTimeRemaining("CONNECT WALLET");
+      setTimeRemaining(t('connectWallet'));
       setIsLoadingState(false);
       return;
     }
@@ -153,7 +155,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
 
             if (timeRemainingMs === 0) {
               setCanOpen(true);
-              setTimeRemaining("NOW");
+              setTimeRemaining(t('now'));
               setFeeRequired(0);
               setIsLoadingState(false);
             } else {
@@ -192,7 +194,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
       } catch (e) {
         console.error("Failed to check contract state:", e);
         setCanOpen(false);
-        setTimeRemaining("CHECKING STATUS...");
+        setTimeRemaining(t('checkingStatus'));
         setIsLoadingState(false);
       }
     };
@@ -253,7 +255,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
     if ((!canOpen && !payFee) || isOpening) return;
 
     if (!connected || !client) {
-      setMintError("Please connect your OneChain wallet first!");
+      setMintError(t('connectWalletFirst'));
       return;
     }
 
@@ -385,9 +387,9 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
 
       // Check for wallet permission errors
       if (errorMessage.includes('viewAccount') || errorMessage.includes('suggestTransaction') || errorMessage.includes('permission')) {
-        setMintError("Your wallet is not connected properly. Please reconnect your wallet and try again.");
+        setMintError(t('walletConnectionError'));
       } else {
-        setMintError(`Minting failed: ${errorMessage}`);
+        setMintError(t('mintingFailed', { errorMessage }));
       }
     } finally {
       setIsOpening(false);
@@ -415,11 +417,11 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
           zIndex: 20
         }}
       >
-        ← BACK
+        {t('back')}
       </button>
 
       <div className="border-4 border-white p-5 text-center relative max-w-3xl w-full mx-4" style={{ backgroundColor: '#3a0000', imageRendering: 'pixelated', zIndex: 10 }}>
-        <h1 className="text-white mb-3 font-bold" style={{ fontSize: '28px' }}>DAILY CHEST</h1>
+        <h1 className="text-white mb-3 font-bold" style={{ fontSize: '28px' }}>{t('dailyChest')}</h1>
 
         {/* Chest Canvas Container - Relative positioning for weapon placement */}
         <div className="relative flex justify-center mb-2" style={{ zIndex: 10 }}>
@@ -448,7 +450,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
         {openedWeapon ? (
           <div className="space-y-2">
             <div className="text-[#ffd700] mb-1 font-bold" style={{ fontSize: '20px', textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}>
-              YOU OBTAINED:
+              {t('youObtained')}
             </div>
             <div
               className="border-4 p-4 mx-auto max-w-xl"
@@ -461,21 +463,21 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
                 {openedWeapon.name.toUpperCase()}
               </div>
               <div className="text-white text-xs space-y-2 mt-2">
-                <div>DAMAGE: <span className="text-[#ffd700] font-bold">{openedWeapon.baseDamage}</span></div>
-                <div>FIRERATE: <span className="text-[#ffd700] font-bold">{calculateFirerate(openedWeapon.cooldown).toFixed(5)}</span></div>
+                <div>{t('damage')}: <span className="text-[#ffd700] font-bold">{openedWeapon.baseDamage}</span></div>
+                <div>{t('firerate')}: <span className="text-[#ffd700] font-bold">{calculateFirerate(openedWeapon.cooldown).toFixed(5)}</span></div>
                 {openedWeapon.range && (
-                  <div>RANGE: <span className="text-[#ffd700] font-bold">{openedWeapon.range}</span></div>
+                  <div>{t('range')}: <span className="text-[#ffd700] font-bold">{openedWeapon.range}</span></div>
                 )}
                 <div className="mt-4 pt-3 border-t border-white/30">
                   <div className="text-white text-xs font-mono truncate" title={openedWeapon.id && !openedWeapon.id.startsWith('default-') ? openedWeapon.id : '0x0000000000000000000000000000000000000000000000000000000000000000'}>
-                    NFT ID: {openedWeapon.id && !openedWeapon.id.startsWith('default-') ? openedWeapon.id : '0x0000000000000000000000000000000000000000000000000000000000000000'}
+                    {t('nftId', { nftId: openedWeapon.id && !openedWeapon.id.startsWith('default-') ? openedWeapon.id : '0x0000000000000000000000000000000000000000000000000000000000000000' })}
                   </div>
                 </div>
               </div>
             </div>
 
             <p className="text-[#00d4ff] font-bold mt-2 mb-6" style={{ fontSize: '14px', textShadow: '1px 1px 0px rgba(0,0,0,0.8)' }}>
-              CHECK YOUR INVENTORY TO VIEW YOUR NEW WEAPON!
+              {t('checkInventory')}
             </p>
 
             <button
@@ -483,7 +485,7 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
               className="bg-green-700 hover:bg-green-600 text-white border-4 border-white py-3 px-10 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] hover:translate-y-1 hover:shadow-none"
               style={{ fontSize: '18px', imageRendering: 'pixelated' }}
             >
-              OK
+              {t('ok')}
             </button>
           </div>
         ) : (
@@ -491,13 +493,13 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
             {canOpen ? (
               <div className="space-y-3">
                 <p className="text-[#ffd700] mb-2 font-bold" style={{ fontSize: '18px', textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}>
-                  TEST YOUR LUCK FOR A RARE WEAPON!
+                  {t('testYourLuck')}
                 </p>
                 <p className="text-white mb-2 font-semibold" style={{ fontSize: '14px' }}>
-                  UNLOCK THIS CHEST TO MINT AN NFT WEAPON
+                  {t('unlockToMint')}
                 </p>
                 <p className="text-gray-300 mb-6 text-xs">
-                  DISCOVER POWERFUL WEAPONS WITH UNIQUE STATS
+                  {t('discoverWeapons')}
                 </p>
 
                 {mintError && (
@@ -512,38 +514,38 @@ const DailyChest = ({ onBack, onWeaponObtained }: DailyChestProps) => {
                   className="bg-green-700 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white border-4 border-white py-4 px-10 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] hover:translate-y-1 hover:shadow-none"
                   style={{ fontSize: '20px', imageRendering: 'pixelated' }}
                 >
-                  {isOpening ? 'MINTING...' : 'OPEN CHEST'}
+                  {isOpening ? t('minting') : t('openChest')}
                 </button>
                 {!connected && (
                   <p className="text-yellow-400 text-sm mt-2">
-                    * Wallet connection required to mint
+                    {t('walletConnectionRequired')}
                   </p>
                 )}
               </div>
             ) : (
               <div className="space-y-2">
                 <p className="text-white mb-2 font-semibold" style={{ fontSize: '16px' }}>
-                  YOU HAVE ALREADY OPENED YOUR DAILY CHEST
+                  {t('alreadyOpened')}
                 </p>
                 <p className="text-[#ffd700] mb-3 font-bold" style={{ fontSize: '18px', textShadow: '1px 1px 0px rgba(0,0,0,0.8)' }}>
-                  {!connected ? "CONNECT WALLET TO CHECK STATUS" :
-                    (isLoadingState ? "CHECKING STATUS..." :
-                      (timeRemaining ? `NEXT CHEST AVAILABLE IN: ${timeRemaining}` : "CHECKING STATUS..."))}
+                  {!connected ? t('connectWalletToCheckStatus') :
+                    (isLoadingState ? t('checkingStatus') :
+                      (timeRemaining ? t('nextChestAvailable', { timeRemaining }) : t('checkingStatus')))}
                 </p>
 
                 {feeRequired > 0 && (
                   <div className="mt-2">
-                    <p className="text-white mb-1 text-xs">OR OPEN IMMEDIATELY</p>
+                    <p className="text-white mb-1 text-xs">{t('orOpenImmediately')}</p>
                     <button
                       onClick={() => handleOpenCrate(true)}
                       disabled={isOpening}
                       className="bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white border-4 border-white py-3 px-6 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] hover:translate-y-1 hover:shadow-none"
                       style={{ fontSize: '16px', imageRendering: 'pixelated' }}
                     >
-                      {isOpening ? 'MINTING...' : `PAY ${(feeRequired / 1_000_000_000).toFixed(4)} OCT FEE`}
+                      {isOpening ? t('minting') : t('payFee', { fee: (feeRequired / 1_000_000_000).toFixed(4) })}
                     </button>
                     <p className="text-gray-400 text-xs mt-1">
-                      (0.1 OCT Base + {((feeRequired / 1_000_000_000) - 0.1).toFixed(4)} Time Fee)
+                      {t('feeDetails', { fee: ((feeRequired / 1_000_000_000) - 0.1).toFixed(4) })}
                     </p>
                   </div>
                 )}
