@@ -1,12 +1,13 @@
-import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useOneWallet } from '../contexts/WalletContext';
 import { ACHIEVEMENTS } from '../data/achievements';
+import { useTranslation } from 'react-i18next';
 import { Achievement } from '../types/game';
 
 interface AchievementsProps {
   onBack: () => void;
 }
+
 const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || '0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af';
 
 interface OwnedAchievement {
@@ -20,10 +21,14 @@ interface OwnedAchievement {
 }
 
 const Achievements = ({ onBack }: AchievementsProps) => {
-  const { t } = useTranslation();
-  const { connected, address, client } = useOneWallet();
+  const { connected, address, client, connect, disconnect, installWallet, isWalletInstalled, isCorrectChain } = useOneWallet();
   const [ownedAchievements, setOwnedAchievements] = useState<OwnedAchievement[]>([]);
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
+  const formatAddress = (addr: string | null) => {
+    if (!addr) return '';
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  };
 
   useEffect(() => {
     const fetchAchievements = async () => {
@@ -102,36 +107,82 @@ const Achievements = ({ onBack }: AchievementsProps) => {
         src="/assets/sprites/image copy 3.png"
         alt="Background"
         className="absolute inset-0 w-screen h-screen object-cover pointer-events-none"
-        style={{ imageRendering: 'pixelated', zIndex: 0 }}
+        style={{ 
+          imageRendering: 'pixelated', 
+          zIndex: 0,
+          filter: 'brightness(0.7) contrast(1.15)',
+          opacity: 0.9
+        }}
       />
       
       {/* Back button */}
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 border-4 border-white py-3 px-8 text-white font-bold bg-[#5a0000] hover:bg-[#7a0000] transition-all"
+        className="absolute top-6 left-6 hud-button py-3 px-8 font-bold"
         style={{ 
           fontSize: '18px',
           imageRendering: 'pixelated',
-          zIndex: 20
+          zIndex: 20,
+          borderColor: 'rgba(0, 200, 255, 0.5)'
         }}
       >
-        {t('back')}
+        <span className="hud-text">← {t('back')}</span>
       </button>
 
-      <div className="border-4 border-white p-8 text-center relative max-w-6xl w-full mx-4 h-[80vh] flex flex-col" style={{ backgroundColor: 'rgba(58, 0, 0, 0.9)', imageRendering: 'pixelated', zIndex: 10 }}>
-        <h1 className="text-white mb-8 font-bold" style={{ fontSize: '48px', textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}>{t('achievements')}</h1>
+      {/* Wallet connection button - top right */}
+      <div className="absolute top-8 right-8 z-20">
+        {connected ? (
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-3">
+              <div className="text-white text-sm font-bold bg-black/70 px-3 py-2 rounded border border-white/30 flex items-center gap-2">
+                {formatAddress(address)}
+                {!isCorrectChain && (
+                  <span className="text-red-400 text-xs font-bold" title="Wrong network">!</span>
+                )}
+              </div>
+              <button
+                onClick={disconnect}
+                className="border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded bg-[#0a4a0a] hover:bg-[#0a5a0a]"
+                style={{ fontSize: '14px', imageRendering: 'pixelated' }}
+              >
+                DISCONNECT
+              </button>
+            </div>
+            {!isCorrectChain && (
+              <div className="text-red-400 text-xs font-bold bg-red-900/50 px-2 py-1 rounded border border-red-400">
+                WRONG NETWORK - SWITCH TO ONECHAIN TESTNET
+              </div>
+            )}
+          </div>
+        ) : (
+          <button
+            onClick={isWalletInstalled() ? connect : installWallet}
+            className="border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded bg-[#1a1a1a] hover:bg-[#2a2a2a]"
+            style={{ fontSize: '14px', imageRendering: 'pixelated' }}
+          >
+            {isWalletInstalled() ? 'CONNECT ONECHAIN WALLET' : 'INSTALL ONECHAIN WALLET'}
+          </button>
+        )}
+      </div>
+
+      <div className="hud-panel p-8 text-center relative max-w-6xl w-full mx-4 h-[80vh] flex flex-col" style={{ imageRendering: 'pixelated', zIndex: 10 }}>
+        <div className="hud-corner hud-corner-tl"></div>
+        <div className="hud-corner hud-corner-tr"></div>
+        <div className="hud-corner hud-corner-bl"></div>
+        <div className="hud-corner hud-corner-br"></div>
+        <h1 className="hud-text-accent mb-8 font-bold" style={{ fontSize: '48px' }}>{t('achievements')}</h1>
         
         {loading && (
-          <div className="text-yellow-300 text-xl font-bold mb-4 animate-pulse">{t('loadingAchievements')}</div>
+          <div className="hud-text-warning text-xl font-bold mb-4 animate-pulse">{t('loadingAchievements')}</div>
         )}
 
         {!connected && (
-          <div className="text-gray-400 text-lg font-bold mb-4">{t('connectWalletToViewAchievements')}</div>
+          <div className="hud-text-accent text-lg font-bold mb-4">{t('connectWalletToViewAchievements')}</div>
         )}
 
         <div className="overflow-y-auto flex-1 pr-4 custom-scrollbar">
           {displayedAchievements.length === 0 && !loading && connected && (
-            <div className="text-gray-400 text-lg font-bold text-center py-8">
+            <div className="hud-text-accent text-lg font-bold text-center py-8">
               {t('noAchievementsOwned')}
             </div>
           )}
@@ -139,9 +190,18 @@ const Achievements = ({ onBack }: AchievementsProps) => {
             {displayedAchievements.map((achievement) => (
               <div 
                 key={achievement.id} 
-                className="border-2 border-yellow-500 bg-yellow-900/20 p-4 flex gap-4 text-left hover:bg-black/60 transition-colors"
+                className="hud-panel p-4 flex gap-4 text-left relative hover:scale-105 transition-all"
+                style={{ borderColor: 'rgba(255, 170, 0, 0.5)' }}
               >
-                <div className="w-24 h-24 flex-shrink-0 border-2 border-white/30 bg-black/50">
+                <div className="hud-corner hud-corner-tl"></div>
+                <div className="hud-corner hud-corner-tr"></div>
+                <div className="hud-corner hud-corner-bl"></div>
+                <div className="hud-corner hud-corner-br"></div>
+                <div className="w-24 h-24 flex-shrink-0 hud-panel p-1 relative">
+                  <div className="hud-corner hud-corner-tl"></div>
+                  <div className="hud-corner hud-corner-tr"></div>
+                  <div className="hud-corner hud-corner-bl"></div>
+                  <div className="hud-corner hud-corner-br"></div>
                   <img 
                     src={achievement.image} 
                     alt={achievement.title} 
@@ -151,17 +211,17 @@ const Achievements = ({ onBack }: AchievementsProps) => {
                 </div>
                 <div className="flex flex-col flex-1 gap-1">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-bold text-xl text-yellow-400">
+                    <h3 className="hud-text-warning font-bold text-xl">
                       {achievement.title}
                     </h3>
-                    <span className="text-gray-400 text-sm">{t('wave', { wave: achievement.waveRequirement })}</span>
+                    <span className="hud-text-accent text-sm">{t('wave', { wave: achievement.waveRequirement })}</span>
                   </div>
-                  <p className="text-white/80 text-sm mb-2">{achievement.description}</p>
-                  <div className="mt-auto pt-2 border-t border-white/20 flex flex-col gap-2">
+                  <p className="hud-text text-sm mb-2">{achievement.description}</p>
+                  <div className="mt-auto pt-2 border-t border-cyan-500/20 flex flex-col gap-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-green-400 text-xs font-bold">{t('owned')}</span>
+                      <span className="hud-text-success text-xs font-bold">{t('owned')}</span>
                     </div>
-                    <div className="text-gray-300 text-xs break-all">
+                    <div className="hud-text-accent text-xs break-all">
                       {t('nftId', { nftId: achievement.nftId })}
                     </div>
                   </div>
@@ -174,17 +234,21 @@ const Achievements = ({ onBack }: AchievementsProps) => {
 
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
-          width: 10px;
+          width: 14px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(0, 0, 0, 0.3);
+          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid rgba(0, 200, 255, 0.2);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #5a0000;
-          border: 1px solid white;
+          background: linear-gradient(135deg, rgba(0, 200, 255, 0.4) 0%, rgba(0, 150, 200, 0.5) 100%);
+          border: 1px solid rgba(0, 200, 255, 0.6);
+          box-shadow: inset 0 0 4px rgba(0, 200, 255, 0.3);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #7a0000;
+          background: linear-gradient(135deg, rgba(0, 200, 255, 0.6) 0%, rgba(0, 150, 200, 0.7) 100%);
+          border-color: rgba(0, 200, 255, 0.9);
+          box-shadow: inset 0 0 6px rgba(0, 200, 255, 0.5);
         }
       `}</style>
     </div>

@@ -109,6 +109,7 @@
   "guide.types.weak": "WEAK",
   "guide.types.normal": "NORMAL",
   "guide.types.strong": "STRONG",
+  "guide.types.lazer": "LAZER",
   "guide.enemies.swarmer.name": "SWARMER",
   "guide.enemies.swarmer.title": "The Living Bomb",
   "guide.enemies.swarmer.hp": "Low",

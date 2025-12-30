@@ -20,7 +20,7 @@ interface EnemyData {
   id: string;
   name: string;
   title: string;
-  type: 'weak' | 'normal' | 'strong';
+  type: 'weak' | 'normal' | 'strong' | 'lazer';
   image: string;
   hp: string;
   speed: string;
