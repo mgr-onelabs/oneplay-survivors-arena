@@ -1,12 +1,12 @@
 
 
-<img width="317" height="305" alt="image" src="https://github.com/user-attachments/assets/84557968-0d02-4496-ac9a-5aafb66e6beb" />
+<!-- <img width="317" height="305" alt="image" src="https://github.com/user-attachments/assets/84557968-0d02-4496-ac9a-5aafb66e6beb" /> -->
 
----
+
 
 # SURVIVAL ARENA
 
-*The Grand Colosseum of Valdris has fallen. The Dark Corruption has consumed the kingdom. You are the last survivor — and the arena is your proving ground.*
+*The Testing Facility was not always a place of death. Decades ago, it stood as the primary research and development center for corporate military technology. Now it serves a darker purpose — drawing in operators with promises of advanced technology and weapons. You are the Operator — and the facility is your proving ground.*
 
 
 
@@ -25,15 +25,17 @@
 
 ## What Is Survival Arena?
 
-A high-intensity action shooter built on **OneChain**.
+A high-intensity cyberpunk action shooter built on **OneChain**.
 
-Fight through endless hordes of corrupted enemies. Unlock powerful abilities inherited from fallen champions. Collect rare and legendary weapons. Open daily chests and test your luck. Build the ultimate arsenal.
+Fight through endless waves of hostile corporate units in a futuristic dystopian world. Unlock powerful combat protocols inherited from fallen operators. Collect rare Prototype weapons. Access Supply Caches daily and test your luck. Build the ultimate arsenal.
 
-**Your skill. Your loot. Your arena.**
+**Your skill. Your loot. Your facility.**
 
 
-<img width="1861" height="995" alt="Screenshot from 2025-11-26 23-37-40" src="https://github.com/user-attachments/assets/17397224-4add-433b-ac1e-462ae238acf0" />
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/184b0adc-3eab-4d9a-96f0-0dc72f0e1b64" />
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/95cad6f9-541b-4cc6-bce7-1c5f0986f611" />
+
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/4bf41513-4d0b-44f0-a027-79afb8e23ad8" />
+
 
 
 
@@ -43,53 +45,62 @@ Fight through endless hordes of corrupted enemies. Unlock powerful abilities inh
 
 ### Diverse Weapon Arsenal
 
-Pistols. Shotguns. Rifles. Blades. Full-auto death machines. Each weapon class handles differently — find the ones that fit your playstyle.
+Plasma Sidearms. Scattershot Launchers. Plasma Snipers. HF Blades. Plasma Cannons. Each weapon class handles differently — find the ones that fit your playstyle.
 
-*Some weapons are common. Some are legendary. Some are so rare that most players will never see them.*
+*Some weapons are Standard. Some are Prototype. Some are so rare that most operators will never see them.*
 
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/a3063b0d-c6d3-47d6-bb30-e641e4e77bc3" />
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/cae7a86d-3c07-4c86-982f-dc59b540fcc3" />
 
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/5c10c1e6-9fe0-4dd7-8a23-82c4d9de4eac" />
+
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/07e04007-c3d6-4216-b8e5-fc7e31f2eeaf" />
+
 
 
 ### Five Rarity Tiers
 
-**Common → Uncommon → Rare → Epic → Legendary**
+**Standard → Advanced → Elite → Superior → Prototype**
 
-Higher rarity means better stats. Legendary weapons are game-changers. And there are whispers of weapons that only exist in Legendary form...
+Higher rarity means better stats. Prototype weapons are game-changers. And there are whispers of weapons that only exist in Prototype form...
 
-### Daily Luck Chest
+### Daily Supply Cache
 
-Every 24 hours, open a chest and mint a random weapon NFT. You might get something ordinary. You might get something that changes everything.
+Every 24 hours, access a Supply Cache and mint a random weapon NFT. You might get something ordinary. You might get something that changes everything.
 
 **Test your luck. Every. Single. Day.**
 
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/293031b4-49e5-49de-8dcb-037054e35e41" />
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/7ee47dba-d1fb-4ca0-bbc3-f0099a8e3662" />
 
 
-### The Corrupted Horde
 
-The arena is filled with corrupted enemies — each with their own mechanics, behaviors, and threats. Some rush you. Some shoot from afar. Some protect their allies. Some... you'll have to discover yourself.
+### The Corporate Hostiles
+
+The facility is filled with hostile corporate units — each with their own mechanics, behaviors, and threats. Cyber Drones rush you with explosive cores. Stalker Units track you with plasma weapons. Warlord Class mechs deploy defensive fields. Shadow Units... you'll have to discover yourself.
 
 *The deeper you go, the more you'll encounter.*
 
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/1175a047-8076-4e71-8f36-dcba7d9097b3" />
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/5aef0e9c-0fc4-4f16-b8d4-d6568b5042ca" />
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/3bc62a2c-1c1c-40a5-ad09-e6643dc8c8bd" />
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/2ad3f8b2-d202-40ad-86dd-d7fbaaf7d8b8" />
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/acd57d10-ed10-4fde-84cf-06f34f27bc31" />
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/533f5b96-43fe-4a8c-a167-769aba77f6a6" />
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/15f5e3e0-eebe-47ed-b72d-6110440d6f59" />
 
 
 
 
 
-### Abilities of the Fallen
 
-The champions who fell before you left behind fragments of their power. Find them. Unlock them. Use them to turn the tide.
 
-Shields that block everything. Flames that burn all around you. Speed that nothing can match. Power that triples your damage. And more waiting to be discovered.
 
-*Each ability is a legacy. Each legacy has a story.*
 
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/ff90a169-0bb1-42d1-812d-19d7dd7be810" />
+### Combat Protocols
+
+The operators who fell before you left behind fragments of their combat data. Find them. Unlock them. Use them to turn the tide.
+
+Nanomachine Barriers that block everything. Plasma Fields that burn all around you. Overdrive Protocols that nothing can match. Nanomachine Enhancements that triple your damage. And more waiting to be discovered.
+
+*Each protocol is a legacy. Each legacy has a story.*
+
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/9251878a-edd6-4c13-81ff-7bafe541d100" />
+
 
 
 ### Loot Drops
@@ -102,23 +113,24 @@ Every weapon is an NFT on OneChain. Mint it. Own it. Transfer it. Trade it.
 
 Your inventory lives in your wallet — not on our servers.
 
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/acda7ba6-122f-48f2-872d-ea2c0e17f567" />
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/04bcaf94-b31c-472a-989a-b89472b194f9" />
+
 
 
 ### Achievement Badges
 
-Hit milestones. Mint proof. Show off your skill with on-chain achievement NFTs.
+Hit milestones. Mint proof. Show off your operator credentials with on-chain achievement NFTs.
 
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/6eb444f9-ff52-449b-bda1-7412f359c514" />
 
 
 ### Weekly Updates
 
-New bosses. New weapons. New mechanics. The arena evolves every week with fresh content — there's always something new to discover, master, and collect.
+New hostile units. New weapons. New mechanics. The facility evolves every week with fresh content — there's always something new to discover, master, and collect.
 
-**Expect new bosses, weapons, and mechanics regularly.**
+**Expect new enemy types, weapons, and mechanics regularly.**
 
-<img width="1858" height="991" alt="image" src="https://github.com/user-attachments/assets/8b27cd3d-31fd-4de5-8cc9-5372eed74827" />
+<img width="1857" height="992" alt="image" src="https://github.com/user-attachments/assets/b27629a5-88cd-4b3f-9aba-d93cdffcb6f7" />
+
 
 
 ### Marketplace *(Coming Soon)*
@@ -131,15 +143,16 @@ Full player-driven economy. Buy weapons you need. Sell duplicates. Trade with th
 
 **Live Now**
 - Core gameplay
-- Daily chest minting
+- Daily Supply Cache minting
 - Weapon NFTs on OneChain
 - Achievement NFTs
 - Multiple weapon classes and rarities
+- Futuristic HUD interface
 
 **Coming Soon**
 - Boss encounters
 - New weapons dropping regularly
-- Expanded abilities
+- Expanded combat protocols
 - New enemy types
 - Full NFT marketplace
 
@@ -174,6 +187,6 @@ contracts/sources/
 
 ---
 
-*The arena awaits. Your weapons await. Your legacy awaits.*
+*The facility awaits. Your weapons await. Your legacy awaits.*
 
 **Play. Loot. Own.**
