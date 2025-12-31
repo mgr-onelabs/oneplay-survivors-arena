@@ -32,11 +32,11 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
   // News entries
   const newsEntries = [
     {
-      id: 'ui_theme_update',
-      title: 'FACILITY HUD SYSTEM UPGRADE',
-      date: 'Dec 3, 2025',
+      id: 'ui_theme_update', 
+      title: t('mainMenu.news.ui_theme_update.title'),
+      date: t('mainMenu.news.ui_theme_update.date'),
       image: '/assets/sprites/image copy 3.png',
-      description: 'The Testing Facility interface has been completely overhauled with a new futuristic robot HUD aesthetic. Angular panels, neon accents, and improved readability now match the cyberpunk dystopian theme. All UI elements including menus, inventory, weapon selection, and in-game displays have been updated to reflect the corporate military facility atmosphere. The new design features clipped angular shapes, dynamic border colors based on weapon rarity, and enhanced visual feedback throughout the entire system.'
+      description: t('mainMenu.news.ui_theme_update.description')
     },
     {
       id: 'mysterious_lazer_enemy',
