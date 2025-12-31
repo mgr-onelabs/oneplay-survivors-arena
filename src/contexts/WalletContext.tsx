@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { SuiClient } from '@onelabs/sui/client';
+import AccountChangeModal from '../components/AccountChangeModal';
 
 interface WalletState {
   connected: boolean;
@@ -17,6 +18,7 @@ interface WalletContextType extends WalletState {
   signTransaction: (input: { transaction: string }) => Promise<{ signature: string }>;
   executeTransaction: (transactionBlock: any) => Promise<any>;
   checkChain: () => Promise<void>;
+  ensureConnected: () => Promise<boolean>;
 }
 
 const WalletContext = createContext<WalletContextType | null>(null);
@@ -25,21 +27,29 @@ const WalletContext = createContext<WalletContextType | null>(null);
 const WALLET_STORAGE_KEY = 'onechain_wallet_connected';
 const WALLET_ADDRESS_KEY = 'onechain_wallet_address';
 
+const networks = {
+    testnet: { url: 'https://rpc-testnet.onelabs.cc:443' },
+    mainnet: { url: "https://rpc-mainnet.onelabs.cc:443" },
+  };
+  type NetworkKey = keyof typeof networks;
+  const NETWORK_RPC = (import.meta.env.VITE_NETWORK as NetworkKey) || 'testnet';
+  // OneChain Testnet chain identifier
+  const ONECHAIN_TESTNET_CHAIN = 'onechain:testnet'; // Common identifier for OneChain Testnet
 // Helper functions (copied from original hook)
 const getWallet = (): any => {
   if (typeof window === 'undefined') return null;
-
+  
   if ((window.navigator as any).wallets) {
     const wallets = (window.navigator as any).wallets;
-    const oneWallet = wallets.find((w: any) =>
-      w.name?.toLowerCase().includes('one') ||
+    const oneWallet = wallets.find((w: any) => 
+      w.name?.toLowerCase().includes('one') || 
       w.name?.toLowerCase().includes('onewallet') ||
       w.name?.toLowerCase().includes('sui')
     );
     if (oneWallet) return oneWallet;
     if (wallets.length > 0) return wallets[0];
   }
-
+  
   const checks = [
     (window as any).onechain,
     (window as any).onechainWallet,
@@ -51,7 +61,7 @@ const getWallet = (): any => {
     (window as any).__ONE_WALLET__,
     (window as any).__oneWallet__,
   ];
-
+  
   for (const check of checks) {
     if (check) return check;
   }
@@ -78,7 +88,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const persistedState = loadPersistedState();
-
+  
   const [walletState, setWalletState] = useState<WalletState>({
     connected: persistedState.connected,
     address: persistedState.address,
@@ -87,15 +97,13 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     isCorrectChain: false,
   });
   const [walletAvailable, setWalletAvailable] = useState(false);
-
-  const networks = {
-    testnet: { url: 'https://rpc-testnet.onelabs.cc:443' },
-    mainnet: { url: "https://rpc-mainnet.onelabs.cc:443" },
-  };
-  type NetworkKey = keyof typeof networks;
-  const NETWORK_RPC = (import.meta.env.VITE_NETWORK as NetworkKey) || 'testnet';
-  // OneChain Testnet chain identifier
-  const ONECHAIN_TESTNET_CHAIN = 'onechain:testnet'; // Common identifier for OneChain Testnet
+  
+  // Account change modal state
+  const [showAccountChangeModal, setShowAccountChangeModal] = useState(false);
+  const [newAccountAddress, setNewAccountAddress] = useState<string | null>(null);
+  const [oldAccountAddress, setOldAccountAddress] = useState<string | null>(null);
+  const previousAddressRef = useRef<string | null>(persistedState.address);
+  const isInitialLoadRef = useRef<boolean>(true);
 
 
   // Initialize client
@@ -108,21 +116,45 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   // Check wallet availability
   useEffect(() => {
-    const checkWallet = () => {
+    const checkWallet = async () => {
       const wallet = getWallet();
       if (wallet) {
         setWalletAvailable(true);
         const suiProvider = getSuiProvider(wallet);
-
+        
         // Auto-reconnect if persisted or if provider is already connected
         if (suiProvider) {
-          const accounts = suiProvider.accounts || wallet.accounts;
+          let accounts: any[] = [];
+          
+          // Try to get accounts using getAccounts() method
+          if (typeof suiProvider.getAccounts === 'function') {
+            try {
+              accounts = await suiProvider.getAccounts();
+            } catch (e) {
+              console.log('getAccounts() failed, trying accounts property:', e);
+              accounts = suiProvider.accounts || wallet.accounts || [];
+            }
+          } else {
+            accounts = suiProvider.accounts || wallet.accounts || [];
+          }
+          
           if (accounts && accounts.length > 0) {
             const address = accounts[0].address || accounts[0];
             const addressStr = typeof address === 'string' ? address : String(address);
-
+            
+            // Check if address actually changed
+            const previousAddress = previousAddressRef.current;
+            const addressChanged = previousAddress !== addressStr && previousAddress !== null;
+            
             // Only update if state is different (to avoid loops)
             if (!walletState.connected || walletState.address !== addressStr) {
+              // If address changed and we had a previous address, show modal (but not on initial load)
+              if (addressChanged && previousAddress && !isInitialLoadRef.current) {
+                setOldAccountAddress(previousAddress);
+                setNewAccountAddress(addressStr);
+                setShowAccountChangeModal(true);
+              }
+              
               setWalletState((prev) => ({
                 ...prev,
                 connected: true,
@@ -130,24 +162,66 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
               }));
               localStorage.setItem(WALLET_STORAGE_KEY, 'true');
               localStorage.setItem(WALLET_ADDRESS_KEY, addressStr);
+              
+              // Update the ref for next comparison
+              previousAddressRef.current = addressStr;
+              
+              // Mark initial load as complete after first check
+              if (isInitialLoadRef.current) {
+                isInitialLoadRef.current = false;
+              }
+            } else if (isInitialLoadRef.current) {
+              // Even if address didn't change, mark initial load as complete
+              isInitialLoadRef.current = false;
+            }
+          } else {
+            // No accounts - disconnected
+            if (previousAddressRef.current && !isInitialLoadRef.current) {
+              setOldAccountAddress(previousAddressRef.current);
+              setNewAccountAddress(null);
+              setShowAccountChangeModal(true);
+              previousAddressRef.current = null;
+            }
+            setWalletState((prev) => ({
+              ...prev,
+              connected: false,
+              address: null,
+            }));
+            localStorage.removeItem(WALLET_STORAGE_KEY);
+            localStorage.removeItem(WALLET_ADDRESS_KEY);
+            
+            // Mark initial load as complete
+            if (isInitialLoadRef.current) {
+              isInitialLoadRef.current = false;
             }
           }
         }
       } else {
         setWalletAvailable(false);
+        if (previousAddressRef.current && !isInitialLoadRef.current) {
+          setOldAccountAddress(previousAddressRef.current);
+          setNewAccountAddress(null);
+          setShowAccountChangeModal(true);
+          previousAddressRef.current = null;
+        }
+        
+        // Mark initial load as complete
+        if (isInitialLoadRef.current) {
+          isInitialLoadRef.current = false;
+        }
       }
     };
 
     checkWallet();
     const handleLoad = () => checkWallet();
     window.addEventListener('load', handleLoad);
-
+    
     // Accounts changed listener
     const handleAccountsChanged = () => {
-      console.log('Account changed event');
+      console.log('Account changed event detected');
       checkWallet();
     };
-
+    
     window.addEventListener('onewallet#accountsChanged', handleAccountsChanged);
     window.addEventListener('oneWallet#accountsChanged', handleAccountsChanged);
     window.addEventListener('accountsChanged', handleAccountsChanged);
@@ -185,13 +259,13 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         // But let's force check immediately
         const accounts = await suiProvider.getAccounts();
         if (accounts && accounts.length > 0) {
-          const address = accounts[0].address || accounts[0];
-          const addressStr = typeof address === 'string' ? address : String(address);
-          setWalletState(prev => ({ ...prev, connected: true, address: addressStr }));
-          localStorage.setItem(WALLET_STORAGE_KEY, 'true');
-          localStorage.setItem(WALLET_ADDRESS_KEY, addressStr);
-          // Check chain after connecting
-          await checkChain();
+            const address = accounts[0].address || accounts[0];
+            const addressStr = typeof address === 'string' ? address : String(address);
+            setWalletState(prev => ({ ...prev, connected: true, address: addressStr }));
+            localStorage.setItem(WALLET_STORAGE_KEY, 'true');
+            localStorage.setItem(WALLET_ADDRESS_KEY, addressStr);
+            // Check chain after connecting
+            await checkChain();
         }
       }
     } catch (error) {
@@ -231,7 +305,100 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     throw new Error('Sign transaction not supported');
   };
 
+  const ensureConnected = async (): Promise<boolean> => {
+    try {
+      const wallet = getWallet();
+      if (!wallet) {
+        console.warn('Wallet not found');
+        return false;
+      }
+
+      const suiProvider = getSuiProvider(wallet);
+      if (!suiProvider) {
+        console.warn('Sui provider not found');
+        return false;
+      }
+
+      // Check if we have accounts/permissions
+      let accounts: any[] = [];
+      
+      // Try to get accounts using getAccounts() method
+      if (typeof suiProvider.getAccounts === 'function') {
+        try {
+          accounts = await suiProvider.getAccounts();
+        } catch (e) {
+          console.log('getAccounts() failed, trying accounts property:', e);
+        }
+      }
+      
+      // Fallback to accounts property
+      if (accounts.length === 0) {
+        accounts = suiProvider.accounts || wallet.accounts || [];
+      }
+
+      // If we have accounts, check if we have the expected address
+      if (accounts.length > 0) {
+        const accountAddress = accounts[0].address || accounts[0];
+        const addressStr = typeof accountAddress === 'string' ? accountAddress : String(accountAddress);
+        
+        // Update state if needed
+        if (!walletState.connected || walletState.address !== addressStr) {
+          setWalletState((prev) => ({
+            ...prev,
+            connected: true,
+            address: addressStr,
+          }));
+          localStorage.setItem(WALLET_STORAGE_KEY, 'true');
+          localStorage.setItem(WALLET_ADDRESS_KEY, addressStr);
+        }
+        
+        return true;
+      }
+
+      // No accounts, try to connect
+      if (typeof suiProvider.connect === 'function') {
+        await suiProvider.connect();
+        
+        // Get accounts after connecting
+        if (typeof suiProvider.getAccounts === 'function') {
+          accounts = await suiProvider.getAccounts();
+        } else {
+          accounts = suiProvider.accounts || wallet.accounts || [];
+        }
+        
+        if (accounts.length > 0) {
+          const accountAddress = accounts[0].address || accounts[0];
+          const addressStr = typeof accountAddress === 'string' ? accountAddress : String(accountAddress);
+          
+          setWalletState((prev) => ({
+            ...prev,
+            connected: true,
+            address: addressStr,
+          }));
+          localStorage.setItem(WALLET_STORAGE_KEY, 'true');
+          localStorage.setItem(WALLET_ADDRESS_KEY, addressStr);
+          
+          // Check chain after connecting
+          await checkChain();
+          
+          return true;
+        }
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('ensureConnected failed:', error);
+      return false;
+    }
+  };
+
   const executeTransaction = async (transactionBlock: any) => {
+    // Ensure account is connected before executing transaction
+    const isConnected = await ensureConnected();
+    if (!isConnected) {
+      throw new Error('Wallet account is not connected. Please connect your wallet and try again.');
+    }
+
     const wallet = getWallet();
     const suiProvider = getSuiProvider(wallet);
     if (suiProvider && suiProvider.signAndExecuteTransactionBlock) {
@@ -303,7 +470,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         // If we can't determine chain, assume it might be correct if connected
         // This is a fallback - ideally wallet should provide chain info
         isCorrectChain = walletState.connected;
-      }
+      } 
 
       setWalletState((prev) => ({ ...prev, chainId, isCorrectChain }));
     } catch (error) {
@@ -331,9 +498,20 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       isWalletInstalled,
       signTransaction,
       executeTransaction,
-      checkChain
+      checkChain,
+      ensureConnected
     }}>
       {children}
+      <AccountChangeModal
+        isOpen={showAccountChangeModal}
+        onClose={() => setShowAccountChangeModal(false)}
+        newAddress={newAccountAddress}
+        oldAddress={oldAccountAddress}
+        currentConnectedAddress={walletState.address}
+        onConnect={connect}
+        isWalletInstalled={isWalletInstalled}
+        installWallet={installWallet}
+      />
     </WalletContext.Provider>
   );
 };

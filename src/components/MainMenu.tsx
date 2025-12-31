@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useTranslation, Trans } from 'react-i18next';
 import { useOneWallet } from '../hooks/useOneWallet';
 import { useMusic } from '../contexts/MusicContext';
 import WalletWarningModal from './WalletWarningModal';
@@ -13,7 +12,6 @@ interface MainMenuProps {
 }
 
 const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }: MainMenuProps) => {
-  const { t, i18n } = useTranslation();
   const { connected, address, connect, disconnect, installWallet, isWalletInstalled, isCorrectChain, chainId, checkChain } = useOneWallet();
   const { isMusicEnabled, toggleMusic, isSfxEnabled, toggleSfx } = useMusic();
   
@@ -32,37 +30,51 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
   // News entries
   const newsEntries = [
     {
+      id: 'ui_theme_update',
+      title: 'FACILITY HUD SYSTEM UPGRADE',
+      date: 'Dec 3, 2025',
+      image: '/assets/sprites/image copy 3.png',
+      description: 'The Testing Facility interface has been completely overhauled with a new futuristic robot HUD aesthetic. Angular panels, neon accents, and improved readability now match the cyberpunk dystopian theme. All UI elements including menus, inventory, weapon selection, and in-game displays have been updated to reflect the corporate military facility atmosphere. The new design features clipped angular shapes, dynamic border colors based on weapon rarity, and enhanced visual feedback throughout the entire system.'
+    },
+    {
+      id: 'mysterious_lazer_enemy',
+      title: 'MYSTERIOUS THREAT DETECTED',
+      date: 'Dec 2, 2025',
+      image: '/assets/sprites/enemy_lazer.png',
+      description: 'A new, unknown enemy type has been spotted in the higher waves. Survivors report seeing a dark silhouette with an ominous presence. Very little is known about this mysterious foe - it appears only in waves 3 and beyond. Approach with extreme caution. Its true nature and capabilities remain a mystery...'
+    },
+    {
       id: 'legendary_machine_gun',
-      title: t('mainMenu.news.legendary_machine_gun.title'),
-      date: t('mainMenu.news.legendary_machine_gun.date'),
+      title: 'LEGENDARY MACHINE GUN',
+      date: 'Dec 1, 2025',
       image: '/assets/pngegg (2).png',
-      description: t('mainMenu.news.legendary_machine_gun.description')
+      description: 'A new Prototype weapon has been discovered! The Plasma Cannon is now available exclusively from Supply Caches. This ultra-rare weapon features an extremely high fire rate and can only be obtained as a Prototype rarity. Good luck finding one!'
     },
     {
       id: 'vest_system',
-      title: t('mainMenu.news.vest_system.title'),
-      date: t('mainMenu.news.vest_system.date'),
+      title: 'VEST SYSTEM ADDED',
+      date: 'Nov 30, 2025',
       image: '/assets/vest.png',
-      description: t('mainMenu.news.vest_system.description')
+      description: 'Protective vests are now available! Collect vests to gain up to 120 blue health (armor) that absorbs damage before your regular health. Vests can spawn randomly or be dropped by defeated enemies. Stay protected out there!'
     },
     {
       id: 'ammo_system',
-      title: t('mainMenu.news.ammo_system.title'),
-      date: t('mainMenu.news.ammo_system.date'),
+      title: 'AMMO DROP SYSTEM',
+      date: 'Nov 29, 2025',
       image: '/assets/ammo.png',
-      description: t('mainMenu.news.ammo_system.description')
+      description: 'Ammo management is now in effect! Non-sword weapons have limited ammo per wave. Collect ammo pickups that spawn randomly or drop from enemies to keep your weapons loaded. Watch your ammo count and stay stocked!'
     },
     {
       id: 'encyclopedia_nov25_2025',
-      title: t('mainMenu.news.encyclopedia_nov25_2025.title'),
-      date: t('mainMenu.news.encyclopedia_nov25_2025.date'),
+      title: 'ENCYCLOPEDIA ADDED',
+      date: 'Nov 25, 2025',
       image: '/assets/guide/encyclopedia_preview.png',
-      description: t('mainMenu.news.encyclopedia_nov25_2025.description')
+      description: 'A comprehensive Encyclopedia has been added to the game! Learn about all enemy types, their abilities, lore, and discover pro tips for using your abilities effectively. Access it from the GUIDE button in the top-left corner.'
     }
   ];
 
   // Track if user has seen the latest news (stored in localStorage)
-  const LATEST_NEWS_ID = 'legendary_machine_gun';
+  const LATEST_NEWS_ID = 'ui_theme_update';
   const [hasUnreadNews, setHasUnreadNews] = useState(() => {
     if (typeof window === 'undefined') return true;
     const lastSeenNews = localStorage.getItem('lastSeenNewsId');
@@ -108,25 +120,10 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
     <>
       <style>{`
         .menu-button {
-          background-color: #5a0000;
+          transition: all 0.2s ease;
         }
         .menu-button:hover {
-          background-color: #7a0000;
-        }
-        .wallet-button {
-          background-color: #1a1a1a;
-          border: 2px solid #4a4a4a;
-        }
-        .wallet-button:hover {
-          background-color: #2a2a2a;
-          border-color: #6a6a6a;
-        }
-        .wallet-button.connected {
-          background-color: #0a4a0a;
-          border-color: #2a7a2a;
-        }
-        .wallet-button.connected:hover {
-          background-color: #0a5a0a;
+          transform: translateY(-2px) scale(1.02);
         }
       `}</style>
       <div 
@@ -135,10 +132,26 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
       >
       {/* Background image covering full screen */}
       <img
-        src="/assets/sprites/image copy 2.png"
+        src="/assets/sprites/image copy 3.png"
         alt="Background"
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ imageRendering: 'pixelated' }}
+        style={{ 
+          imageRendering: 'pixelated',
+          filter: 'brightness(0.7) contrast(1.15)',
+          opacity: 0.9
+        }}
+      />
+      
+      {/* Strong enemy image on the right side */}
+      <img
+        src="/assets/sprites/image (1) (1).png"
+        alt="Strong Enemy"
+        className="absolute right-52 top-[55%] -translate-y-1/2 z-10 pointer-events-none"
+        style={{ 
+          imageRendering: 'pixelated',
+          width: '700px',
+          height: 'auto'
+        }}
       />
       
       {/* Audio controls and Guide - top left */}
@@ -150,18 +163,23 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               handleButtonInteraction(); // Register interaction
               toggleMusic();
             }}
-            className="border-2 border-white/50 py-2 px-3 text-white font-bold transition-all rounded bg-black/70 hover:bg-black/90 w-12 h-12 flex items-center justify-center"
+            className="hud-button w-12 h-12 flex items-center justify-center"
             style={{ 
               fontSize: '24px',
               imageRendering: 'pixelated',
-              opacity: isMusicEnabled ? 1 : 0.5
+              opacity: isMusicEnabled ? 1 : 0.5,
+              borderColor: 'rgba(0, 200, 255, 0.5)'
             }}
-            title={t('musicOnTitle')}
+            title={isMusicEnabled ? 'Music ON - Click to turn off' : 'Music OFF - Click to turn on'}
           >
             {isMusicEnabled ? '🎵' : '🔇'}
           </button>
-          <span className="text-white font-bold text-sm bg-black/50 px-2 py-1 rounded border border-white/20" style={{ imageRendering: 'pixelated' }}>
-            {t('music')} {isMusicEnabled ? t('on') : t('off')}
+          <span className="hud-panel px-2 py-1 relative" style={{ imageRendering: 'pixelated' }}>
+            <div className="hud-corner hud-corner-tl"></div>
+            <div className="hud-corner hud-corner-tr"></div>
+            <div className="hud-corner hud-corner-bl"></div>
+            <div className="hud-corner hud-corner-br"></div>
+            <span className="hud-text font-bold text-sm">MUSIC {isMusicEnabled ? 'ON' : 'OFF'}</span>
           </span>
         </div>
 
@@ -172,18 +190,23 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               handleButtonInteraction(); // Register interaction
               toggleSfx();
             }}
-            className="border-2 border-white/50 py-2 px-3 text-white font-bold transition-all rounded bg-black/70 hover:bg-black/90 w-12 h-12 flex items-center justify-center"
+            className="hud-button w-12 h-12 flex items-center justify-center"
             style={{ 
               fontSize: '24px',
               imageRendering: 'pixelated',
-              opacity: isSfxEnabled ? 1 : 0.5
+              opacity: isSfxEnabled ? 1 : 0.5,
+              borderColor: 'rgba(0, 200, 255, 0.5)'
             }}
-            title={t('sfxOnTitle')}
+            title={isSfxEnabled ? 'SFX ON - Click to turn off' : 'SFX OFF - Click to turn on'}
           >
             {isSfxEnabled ? '🔊' : '🔈'}
           </button>
-          <span className="text-white font-bold text-sm bg-black/50 px-2 py-1 rounded border border-white/20" style={{ imageRendering: 'pixelated' }}>
-            {t('sfx')} {isSfxEnabled ? t('on') : t('off')}
+          <span className="hud-panel px-2 py-1 relative" style={{ imageRendering: 'pixelated' }}>
+            <div className="hud-corner hud-corner-tl"></div>
+            <div className="hud-corner hud-corner-tr"></div>
+            <div className="hud-corner hud-corner-bl"></div>
+            <div className="hud-corner hud-corner-br"></div>
+            <span className="hud-text font-bold text-sm">SFX {isSfxEnabled ? 'ON' : 'OFF'}</span>
           </span>
         </div>
 
@@ -194,17 +217,22 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               handleButtonInteraction();
               onGuide();
             }}
-            className="border-2 border-white/50 py-2 px-3 text-white font-bold transition-all rounded bg-black/70 hover:bg-black/90 w-12 h-12 flex items-center justify-center"
+            className="hud-button w-12 h-12 flex items-center justify-center"
             style={{ 
               fontSize: '24px',
-              imageRendering: 'pixelated'
+              imageRendering: 'pixelated',
+              borderColor: 'rgba(0, 200, 255, 0.5)'
             }}
-            title={t('guideTitle')}
+            title="Encyclopedia / Guide"
           >
             📖
           </button>
-          <span className="text-white font-bold text-sm bg-black/50 px-2 py-1 rounded border border-white/20" style={{ imageRendering: 'pixelated' }}>
-            {t('guide')}
+          <span className="hud-panel px-2 py-1 relative" style={{ imageRendering: 'pixelated' }}>
+            <div className="hud-corner hud-corner-tl"></div>
+            <div className="hud-corner hud-corner-tr"></div>
+            <div className="hud-corner hud-corner-bl"></div>
+            <div className="hud-corner hud-corner-br"></div>
+            <span className="hud-text font-bold text-sm">GUIDE</span>
           </span>
         </div>
 
@@ -213,12 +241,13 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
           <div className="relative">
             <button
               onClick={handleOpenNews}
-              className="border-2 border-white/50 py-2 px-3 text-white font-bold transition-all rounded bg-black/70 hover:bg-black/90 w-12 h-12 flex items-center justify-center"
+              className="hud-button w-12 h-12 flex items-center justify-center"
               style={{ 
                 fontSize: '24px',
-                imageRendering: 'pixelated'
+                imageRendering: 'pixelated',
+                borderColor: 'rgba(0, 200, 255, 0.5)'
               }}
-              title={t('newsTitle')}
+              title="Latest News"
             >
               📰
             </button>
@@ -230,24 +259,14 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               />
             )}
           </div>
-          <span className="text-white font-bold text-sm bg-black/50 px-2 py-1 rounded border border-white/20" style={{ imageRendering: 'pixelated' }}>
-            {t('news')}
+          <span className="hud-panel px-2 py-1 relative" style={{ imageRendering: 'pixelated' }}>
+            <div className="hud-corner hud-corner-tl"></div>
+            <div className="hud-corner hud-corner-tr"></div>
+            <div className="hud-corner hud-corner-bl"></div>
+            <div className="hud-corner hud-corner-br"></div>
+            <span className="hud-text font-bold text-sm">NEWS</span>
           </span>
         </div>
-      </div>
-
-      {/* Language switcher - top right */}
-      <div className="absolute top-8 right-80 z-20">
-        <button
-          onClick={() => {
-            const newLang = i18n.language === 'en' ? 'zh' : 'en';
-            i18n.changeLanguage(newLang);
-          }}
-          className="wallet-button border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded"
-          style={{ fontSize: '14px', imageRendering: 'pixelated' }}
-        >
-          {i18n.language === 'en' ? '中文' : 'English'}
-        </button>
       </div>
 
       {/* Wallet connection button - top right */}
@@ -255,53 +274,69 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
         {connected ? (
           <div className="flex flex-col items-end gap-2">
             <div className="flex items-center gap-3">
-              <div className="text-white text-sm font-bold bg-black/70 px-3 py-2 rounded border border-white/30 flex items-center gap-2">
+              <div className="hud-panel px-3 py-2 relative">
+                <div className="hud-corner hud-corner-tl"></div>
+                <div className="hud-corner hud-corner-tr"></div>
+                <div className="hud-corner hud-corner-bl"></div>
+                <div className="hud-corner hud-corner-br"></div>
+                <div className="hud-text text-sm font-bold flex items-center gap-2">
                 {formatAddress(address)}
                 {!isCorrectChain && (
-                  <span className="text-red-400 text-xs font-bold" title="Wrong network">!</span>
+                    <span className="hud-text-danger text-xs font-bold" title="Wrong network">!</span>
                 )}
+                </div>
               </div>
               <button
                 onClick={disconnect}
-                className="wallet-button connected border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded"
-                style={{ fontSize: '14px', imageRendering: 'pixelated' }}
+                className="hud-button py-2 px-4 text-sm font-bold"
+                style={{ fontSize: '14px', imageRendering: 'pixelated', borderColor: 'rgba(0, 255, 136, 0.5)' }}
               >
-                {t('disconnect')}
+                <span className="hud-text-success">DISCONNECT</span>
               </button>
             </div>
             {!isCorrectChain && (
-              <div className="text-red-400 text-xs font-bold bg-red-900/50 px-2 py-1 rounded border border-red-400">
-                {t('wrongNetworkSwitch')}
+              <div className="hud-panel px-2 py-1 relative">
+                <div className="hud-corner hud-corner-tl"></div>
+                <div className="hud-corner hud-corner-tr"></div>
+                <div className="hud-corner hud-corner-bl"></div>
+                <div className="hud-corner hud-corner-br"></div>
+                <div className="hud-text-danger text-xs font-bold">WRONG NETWORK - SWITCH TO ONECHAIN TESTNET</div>
               </div>
             )}
           </div>
         ) : (
           <button
             onClick={isWalletInstalled() ? connect : installWallet}
-            className="wallet-button border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded"
-            style={{ fontSize: '14px', imageRendering: 'pixelated' }}
+            className="hud-button py-2 px-4 text-sm font-bold"
+            style={{ fontSize: '14px', imageRendering: 'pixelated', borderColor: 'rgba(0, 200, 255, 0.5)' }}
           >
-            {isWalletInstalled() ? t('connectWallet') : t('installWallet')}
+            <span className="hud-text">{isWalletInstalled() ? 'CONNECT ONECHAIN WALLET' : 'INSTALL ONECHAIN WALLET'}</span>
           </button>
         )}
       </div>
       
       {/* Game title at the top */}
-      <div className="absolute top-8 left-0 right-0 text-center z-10">
+      <div className="absolute top-12 left-0 right-0 text-center z-10 pointer-events-none">
         <h1 
-          className="font-bold"
+          className="font-bold hud-text-accent"
           style={{ 
-            fontSize: '72px',
-            background: 'linear-gradient(135deg, #8b0000, #ff4500, #ff8c00, #8b0000, #4a0000)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            textShadow: '4px 4px 0px rgba(0,0,0,0.9), 0 0 20px rgba(255, 69, 0, 0.8), 0 0 40px rgba(139, 0, 0, 0.6)',
+            fontSize: '96px',
             imageRendering: 'pixelated',
-            filter: 'drop-shadow(0 0 15px rgba(255, 69, 0, 0.7))'
-          }}
+            letterSpacing: '12px',
+            lineHeight: '1.2',
+            fontWeight: '900',
+            WebkitTextStroke: '4px #000000',
+            textShadow: 
+              '4px 4px 0px rgba(0, 0, 0, 1), ' +
+              '-4px -4px 0px rgba(0, 0, 0, 1), ' +
+              '4px -4px 0px rgba(0, 0, 0, 1), ' +
+              '-4px 4px 0px rgba(0, 0, 0, 1), ' +
+              '0 0 15px rgba(0, 200, 255, 0.9), ' +
+              '0 0 30px rgba(0, 200, 255, 0.7), ' +
+              '0 0 45px rgba(0, 200, 255, 0.5)'
+          } as React.CSSProperties}
         >
-          {t('gameTitle')}
+          SURVIVAL ARENA
         </h1>
       </div>
       
@@ -310,34 +345,34 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
         <div className="relative">
           <button
             onClick={() => handleMenuClick(onPlay)}
-            className="border-4 border-white py-6 px-12 text-white transition-all w-80 font-bold menu-button"
+            className="menu-main-button py-6 px-12 w-80 font-bold"
             style={{ 
               fontSize: '24px',
               imageRendering: 'pixelated'
             }}
           >
-            {t('play')}
+            <span className="hud-text-accent relative z-10">PLAY</span>
           </button>
           
           {/* Trophy icon button - positioned to the right, slightly upward */}
           <button
             onClick={onAchievements}
-            className="absolute -right-20 -top-4 text-yellow-400 hover:text-yellow-200 hover:scale-110 transition-all p-2 text-6xl cursor-pointer"
+            className="absolute -right-20 -top-4 hud-text-warning hover:scale-110 transition-all p-2 text-6xl cursor-pointer"
             style={{ 
               background: 'transparent',
               border: 'none',
               fontSize: '60px',
               lineHeight: '1',
               transform: 'scale(1)',
-              filter: 'drop-shadow(2px 2px 0px rgba(0,0,0,0.5))'
+              filter: 'drop-shadow(0 0 3px rgba(255, 170, 0, 0.6))'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.filter = 'drop-shadow(4px 4px 0px rgba(0,0,0,0.5)) brightness(1.2)';
+              e.currentTarget.style.filter = 'drop-shadow(0 0 6px rgba(255, 170, 0, 0.9)) brightness(1.2)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.filter = 'drop-shadow(2px 2px 0px rgba(0,0,0,0.5))';
+              e.currentTarget.style.filter = 'drop-shadow(0 0 3px rgba(255, 170, 0, 0.6))';
             }}
-            title={t('achievements')}
+            title="Achievements"
           >
             🏆
           </button>
@@ -345,62 +380,66 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
 
         <button
           onClick={() => handleMenuClick(onInventory)}
-          className="border-4 border-white py-6 px-12 text-white transition-all w-80 font-bold menu-button"
+          className="menu-main-button py-6 px-12 w-80 font-bold"
           style={{ 
             fontSize: '24px',
             imageRendering: 'pixelated'
           }}
         >
-          {t('inventory')}
+          <span className="hud-text relative z-10">INVENTORY</span>
         </button>
 
         <button
           onClick={() => handleMenuClick(onDailyChest)}
-          className="border-4 border-white py-6 px-12 text-white transition-all w-80 font-bold menu-button"
+          className="menu-main-button py-6 px-12 w-80 font-bold"
           style={{ 
             fontSize: '24px',
             imageRendering: 'pixelated'
           }}
         >
-          {t('dailyChest')}
+          <span className="hud-text relative z-10">SUPPLY CACHE</span>
         </button>
 
         <button
           onClick={() => setShowComingSoon(true)}
-          className="border-4 border-white py-6 px-12 text-white transition-all w-80 font-bold menu-button"
+          className="menu-main-button py-6 px-12 w-80 font-bold"
           style={{ 
             fontSize: '24px',
             imageRendering: 'pixelated'
           }}
         >
-          {t('marketplace')}
+          <span className="hud-text relative z-10">MARKETPLACE</span>
         </button>
       </div>
 
       {/* Controls Info - Bottom Center */}
       <div className="absolute bottom-8 left-0 right-0 text-center z-10 pointer-events-none">
-        <div className="inline-block bg-black/70 border-2 border-white/30 p-4 rounded text-white/80">
-          <p className="text-sm font-bold mb-2 text-yellow-400">{t('controls')}</p>
+        <div className="hud-panel p-4 relative inline-block">
+          <div className="hud-corner hud-corner-tl"></div>
+          <div className="hud-corner hud-corner-tr"></div>
+          <div className="hud-corner hud-corner-bl"></div>
+          <div className="hud-corner hud-corner-br"></div>
+          <p className="hud-text-warning text-sm font-bold mb-2">CONTROLS</p>
           <div className="flex gap-8 text-xs">
             <div className="flex flex-col items-center">
-              <span className="font-bold text-white">WASD</span>
-              <span>{t('move')}</span>
+              <span className="hud-text font-bold">WASD</span>
+              <span className="hud-text-accent">MOVE</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="font-bold text-white">MOUSE</span>
-              <span>{t('aim')}</span>
+              <span className="hud-text font-bold">MOUSE</span>
+              <span className="hud-text-accent">AIM</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="font-bold text-white">L-CLICK</span>
-              <span>{t('shoot')}</span>
+              <span className="hud-text font-bold">L-CLICK</span>
+              <span className="hud-text-accent">SHOOT</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="font-bold text-white">1 - 5</span>
-              <span>{t('abilities')}</span>
+              <span className="hud-text font-bold">1 - 5</span>
+              <span className="hud-text-accent">ABILITIES</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="font-bold text-white">E</span>
-              <span>{t('interact')}</span>
+              <span className="hud-text font-bold">E</span>
+              <span className="hud-text-accent">INTERACT</span>
             </div>
           </div>
         </div>
@@ -420,30 +459,32 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
           onClick={() => setShowChainWarning(false)}
         >
           <div 
-            className="bg-gray-900 border-4 border-red-500 p-8 max-w-md w-full mx-4 relative"
+            className="hud-panel p-8 max-w-md w-full mx-4 relative"
             onClick={(e) => e.stopPropagation()}
-            style={{ fontFamily: "'Pixelify Sans', sans-serif" }}
+            style={{ fontFamily: "'Pixelify Sans', sans-serif', borderColor: 'rgba(255, 68, 68, 0.6)" }}
           >
+            <div className="hud-corner hud-corner-tl"></div>
+            <div className="hud-corner hud-corner-tr"></div>
+            <div className="hud-corner hud-corner-bl"></div>
+            <div className="hud-corner hud-corner-br"></div>
             <h2 
-              className="text-red-400 text-2xl font-bold mb-4 text-center"
+              className="hud-text-danger text-2xl font-bold mb-4 text-center"
               style={{ imageRendering: 'pixelated' }}
             >
-              {t('wrongNetworkTitle')}
+              WRONG NETWORK
             </h2>
             
-            <p className="text-white text-lg mb-4 text-center">
-              {t('wrongNetworkMessage')}
+            <p className="hud-text text-lg mb-4 text-center">
+              Your wallet is connected to the wrong network.
             </p>
             
-            <p className="text-yellow-300 text-base mb-6 text-center font-bold">
-                            <Trans i18nKey="switchToTestnet">
-                Please switch to <span className="text-cyan-300">OneChain Testnet</span> in your wallet settings.
-              </Trans>
+            <p className="hud-text-warning text-base mb-6 text-center font-bold">
+              Please switch to <span className="hud-text-accent">OneChain Testnet</span> in your wallet settings.
             </p>
 
             {chainId && (
-              <p className="text-gray-400 text-sm mb-6 text-center">
-                {t('currentNetwork', { chainId })}
+              <p className="hud-text-accent text-sm mb-6 text-center">
+                Current network: {chainId}
               </p>
             )}
             
@@ -453,17 +494,17 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                   setShowChainWarning(false);
                   checkChain();
                 }}
-                className="border-2 border-white py-2 px-6 text-white font-bold transition-all bg-gray-800 hover:bg-gray-700"
-                style={{ fontSize: '16px', imageRendering: 'pixelated' }}
+                className="hud-button py-2 px-6 font-bold"
+                style={{ fontSize: '16px', imageRendering: 'pixelated', borderColor: 'rgba(0, 200, 255, 0.5)' }}
               >
-                {t('checkAgain')}
+                <span className="hud-text">CHECK AGAIN</span>
               </button>
               <button
                 onClick={() => setShowChainWarning(false)}
-                className="border-2 border-white py-2 px-6 text-white font-bold transition-all bg-red-800 hover:bg-red-700"
-                style={{ fontSize: '16px', imageRendering: 'pixelated' }}
+                className="hud-button py-2 px-6 font-bold"
+                style={{ fontSize: '16px', imageRendering: 'pixelated', borderColor: 'rgba(255, 68, 68, 0.5)' }}
               >
-                {t('close')}
+                <span className="hud-text-danger">CLOSE</span>
               </button>
             </div>
           </div>
@@ -477,43 +518,61 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
           onClick={() => setShowNews(false)}
         >
           <div 
-            className="border-4 border-white p-6 max-w-xl w-full mx-4 relative max-h-[80vh] overflow-y-auto"
+            className="hud-panel max-w-xl w-full mx-4 relative max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
-            style={{ fontFamily: "'Pixelify Sans', sans-serif", backgroundColor: '#3a0000' }}
+            style={{ fontFamily: "'Pixelify Sans', sans-serif", overflow: 'hidden' }}
           >
+            <div className="hud-corner hud-corner-tl"></div>
+            <div className="hud-corner hud-corner-tr"></div>
+            <div className="hud-corner hud-corner-bl"></div>
+            <div className="hud-corner hud-corner-br"></div>
             {/* Close button */}
             <button
               onClick={() => setShowNews(false)}
-              className="absolute top-4 right-4 text-white hover:text-red-400 transition-colors font-bold"
+              className="absolute top-4 right-4 hud-text hover:hud-text-danger transition-colors font-bold z-10"
               style={{ fontSize: '24px', imageRendering: 'pixelated' }}
             >
               ✕
             </button>
 
+            <div className="p-6 pb-4 flex-shrink-0">
             <h2 
-              className="text-white text-2xl font-bold mb-6 text-center border-b-4 border-white pb-4"
+                className="hud-text-accent text-2xl font-bold mb-6 text-center border-b-2 border-cyan-500/50 pb-4"
               style={{ imageRendering: 'pixelated' }}
             >
-              {t('latestNews')}
+              LATEST NEWS
             </h2>
+            </div>
             
-            {/* News Entries */}
+            {/* News Entries - Scrollable area */}
+            <div className="flex-1 overflow-y-auto px-6 pb-6" style={{ minHeight: 0 }}>
             <div className="space-y-4">
               {newsEntries.map((news) => (
-                <div key={news.id} className="border-4 border-white p-4" style={{ backgroundColor: '#5a0000' }}>
+                <div key={news.id} className="hud-panel p-4 relative">
+                  <div className="hud-corner hud-corner-tl"></div>
+                  <div className="hud-corner hud-corner-tr"></div>
+                  <div className="hud-corner hud-corner-bl"></div>
+                  <div className="hud-corner hud-corner-br"></div>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-yellow-300 font-bold" style={{ fontSize: '18px' }}>{news.title}</span>
-                    <span className="text-gray-300 text-sm font-bold">{news.date}</span>
+                    <span className="hud-text-warning font-bold" style={{ fontSize: '18px' }}>{news.title}</span>
+                    <span className="hud-text-accent text-sm font-bold">{news.date}</span>
                   </div>
                   
                   {/* News Image */}
                   {news.image && (
-                    <div className="mb-4 border-2 border-white/50 overflow-hidden">
+                    <div className="mb-4 hud-panel p-2 relative overflow-hidden">
+                      <div className="hud-corner hud-corner-tl"></div>
+                      <div className="hud-corner hud-corner-tr"></div>
+                      <div className="hud-corner hud-corner-bl"></div>
+                      <div className="hud-corner hud-corner-br"></div>
                       <img 
                         src={news.image} 
                         alt={news.title}
                         className="w-full h-48 object-cover"
-                        style={{ imageRendering: 'pixelated' }}
+                        style={{ 
+                          imageRendering: 'pixelated',
+                          filter: news.id === 'mysterious_lazer_enemy' ? 'brightness(0) contrast(1.5)' : 'none'
+                        }}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
@@ -522,11 +581,12 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                     </div>
                   )}
                   
-                  <p className="text-white leading-relaxed" style={{ fontSize: '14px' }}>
+                  <p className="hud-text leading-relaxed" style={{ fontSize: '14px' }}>
                     {news.description}
                   </p>
                 </div>
               ))}
+              </div>
             </div>
           </div>
         </div>
@@ -539,32 +599,37 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
           onClick={() => setShowComingSoon(false)}
         >
           <div 
-            className="bg-gray-900 border-4 border-yellow-500 p-8 max-w-md w-full mx-4 relative"
+            className="hud-panel p-8 max-w-md w-full mx-4 relative"
             onClick={(e) => e.stopPropagation()}
-            style={{ fontFamily: "'Pixelify Sans', sans-serif" }}
+            style={{ fontFamily: "'Pixelify Sans', sans-serif', borderColor: 'rgba(255, 170, 0, 0.6)" }}
           >
+            <div className="hud-corner hud-corner-tl"></div>
+            <div className="hud-corner hud-corner-tr"></div>
+            <div className="hud-corner hud-corner-bl"></div>
+            <div className="hud-corner hud-corner-br"></div>
             <h2 
-              className="text-yellow-400 text-2xl font-bold mb-4 text-center"
+              className="hud-text-warning text-2xl font-bold mb-4 text-center"
               style={{ imageRendering: 'pixelated' }}
             >
-              {t('marketplace')}
+              MARKETPLACE
             </h2>
             
-            <p className="text-white text-lg mb-6 text-center font-bold">
-              {t('comingSoon')}
+            <p className="hud-text text-lg mb-6 text-center font-bold">
+              COMING SOON
             </p>
             
-            <p className="text-gray-300 text-base mb-6 text-center">
-              {t('marketplaceComingSoon')}
+            <p className="hud-text-accent text-base mb-6 text-center">
+              The marketplace feature is under development. 
+              Check back soon to buy and sell weapons!
             </p>
             
             <div className="flex justify-center">
               <button
                 onClick={() => setShowComingSoon(false)}
-                className="border-2 border-white py-2 px-8 text-white font-bold transition-all bg-gray-800 hover:bg-gray-700"
-                style={{ fontSize: '16px', imageRendering: 'pixelated' }}
+                className="hud-button py-2 px-8 font-bold"
+                style={{ fontSize: '16px', imageRendering: 'pixelated', borderColor: 'rgba(0, 200, 255, 0.5)' }}
               >
-                {t('close')}
+                <span className="hud-text">CLOSE</span>
               </button>
             </div>
           </div>
@@ -576,3 +641,4 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
 };
 
 export default MainMenu;
+

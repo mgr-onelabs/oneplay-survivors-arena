@@ -1,7 +1,6 @@
-import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef } from 'react';
 import { Weapon } from '../types/game';
-import { getRarityColor, getRarityBorderColor, calculateFirerate } from '../data/weapons';
+import { getRarityColor, getRarityBorderColor, calculateFirerate, getDebugWeapons } from '../data/weapons';
 import { spriteManager } from '../utils/spriteManager';
 import { useOneWallet } from '../hooks/useOneWallet';
 import { Transaction } from '@onelabs/sui/transactions';
@@ -13,9 +12,29 @@ interface InventoryProps {
 }
 
 const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
-  const { t } = useTranslation();
-  const { executeTransaction } = useOneWallet();
-  const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(playerInventory[0] || null);
+  const { executeTransaction, connected, address, connect, disconnect, installWallet, isWalletInstalled, isCorrectChain } = useOneWallet();
+  
+  // Check for debug flag from environment
+  const isDebugMode = import.meta.env.VITE_DEBUG_WEAPONS === 'true';
+
+  console.log('isDebugMode', isDebugMode);
+  
+  // Use debug weapons if flag is enabled, otherwise use player inventory
+  const displayInventory = isDebugMode ? getDebugWeapons() : playerInventory;
+  
+  const formatAddress = (addr: string | null) => {
+    if (!addr) return '';
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  };
+  const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(displayInventory[0] || null);
+  
+  // Update selected weapon when inventory changes
+  useEffect(() => {
+    if (displayInventory.length > 0 && (!selectedWeapon || !displayInventory.find(w => w.id === selectedWeapon.id))) {
+      setSelectedWeapon(displayInventory[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayInventory.length, isDebugMode]);
   const [spritesLoaded, setSpritesLoaded] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -49,7 +68,7 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
       
       // Check for wallet permission errors
       if (errorMessage.includes('viewAccount') || errorMessage.includes('suggestTransaction') || errorMessage.includes('permission')) {
-        setTransferError(t('walletConnectionError'));
+        setTransferError("Your wallet is not connected properly. Please reconnect your wallet and try again.");
       } else {
         setTransferError(errorMessage);
       }
@@ -117,19 +136,21 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
           background-color: #7a0000;
         }
         .weapons-scrollable::-webkit-scrollbar {
-          width: 16px;
+          width: 14px;
         }
         .weapons-scrollable::-webkit-scrollbar-track {
-          background: #1a0000;
-          border: 2px solid #3a0000;
+          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid rgba(0, 200, 255, 0.2);
         }
         .weapons-scrollable::-webkit-scrollbar-thumb {
-          background: #5a0000;
-          border: 2px solid #3a0000;
-          border-radius: 0;
+          background: linear-gradient(135deg, rgba(0, 200, 255, 0.4) 0%, rgba(0, 150, 200, 0.5) 100%);
+          border: 1px solid rgba(0, 200, 255, 0.6);
+          box-shadow: inset 0 0 4px rgba(0, 200, 255, 0.3);
         }
         .weapons-scrollable::-webkit-scrollbar-thumb:hover {
-          background: #7a0000;
+          background: linear-gradient(135deg, rgba(0, 200, 255, 0.6) 0%, rgba(0, 150, 200, 0.7) 100%);
+          border-color: rgba(0, 200, 255, 0.9);
+          box-shadow: inset 0 0 6px rgba(0, 200, 255, 0.5);
         }
       `}</style>
       <div className="h-screen w-screen bg-black text-white flex overflow-hidden relative" style={{ fontFamily: "'Pixelify Sans', sans-serif" }}>
@@ -138,28 +159,72 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
           src="/assets/sprites/image copy 3.png"
           alt="Background"
           className="absolute inset-0 w-screen h-screen object-cover pointer-events-none"
-          style={{ imageRendering: 'pixelated', zIndex: 0 }}
+        style={{ 
+          imageRendering: 'pixelated', 
+          zIndex: 0,
+          filter: 'brightness(0.7) contrast(1.15)',
+          opacity: 0.9
+        }}
         />
         
         {/* Back button */}
         <button
           onClick={onBack}
-          className="absolute top-6 left-6 border-4 border-white py-3 px-8 text-white font-bold back-button"
+          className="absolute top-6 left-6 hud-button py-3 px-8 font-bold"
           style={{ 
             fontSize: '18px',
             imageRendering: 'pixelated',
-            zIndex: 20
+            zIndex: 20,
+            borderColor: 'rgba(0, 200, 255, 0.5)'
           }}
         >
-          {t('back')}
+          <span className="hud-text">← BACK</span>
         </button>
 
+        {/* Wallet connection button - top right */}
+        <div className="absolute top-8 right-8 z-20">
+          {connected ? (
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center gap-3">
+                <div className="text-white text-sm font-bold bg-black/70 px-3 py-2 rounded border border-white/30 flex items-center gap-2">
+                  {formatAddress(address)}
+                  {!isCorrectChain && (
+                    <span className="text-red-400 text-xs font-bold" title="Wrong network">!</span>
+                  )}
+                </div>
+                <button
+                  onClick={disconnect}
+                  className="border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded bg-[#0a4a0a] hover:bg-[#0a5a0a]"
+                  style={{ fontSize: '14px', imageRendering: 'pixelated' }}
+                >
+                  DISCONNECT
+                </button>
+              </div>
+              {!isCorrectChain && (
+                <div className="text-red-400 text-xs font-bold bg-red-900/50 px-2 py-1 rounded border border-red-400">
+                  WRONG NETWORK - SWITCH TO ONECHAIN TESTNET
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={isWalletInstalled() ? connect : installWallet}
+              className="border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded bg-[#1a1a1a] hover:bg-[#2a2a2a]"
+              style={{ fontSize: '14px', imageRendering: 'pixelated' }}
+            >
+              {isWalletInstalled() ? 'CONNECT ONECHAIN WALLET' : 'INSTALL ONECHAIN WALLET'}
+            </button>
+          )}
+        </div>
+
         {/* Left side - Weapon list */}
-        <div className="w-1/3 p-8 pt-20 border-r-4 border-white overflow-y-auto flex-shrink-0 relative weapons-scrollable" style={{ zIndex: 10 }}>
-          <h1 className="text-white mb-8 text-center font-bold" style={{ fontSize: '32px' }}>{t('inventory')}</h1>
+        <div className="w-1/3 p-8 pt-20 border-r-2 border-cyan-500/30 overflow-y-auto flex-shrink-0 relative weapons-scrollable" style={{ zIndex: 10 }}>
+          <h1 className="hud-text-accent mb-8 text-center font-bold" style={{ fontSize: '32px' }}>
+            INVENTORY
+          </h1>
 
           <div className="flex flex-col gap-4">
-            {playerInventory.map((weapon) => {
+            {displayInventory.map((weapon) => {
               const rarityColor = getRarityColor(weapon.rarity);
               const rarityBorderColor = getRarityBorderColor(weapon.rarity);
               const isSelected = selectedWeapon?.type === weapon.type && selectedWeapon?.rarity === weapon.rarity;
@@ -168,16 +233,27 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
                 <button
                   key={weapon.id || `${weapon.type}-${weapon.rarity}-${Math.random()}`}
                   onClick={() => setSelectedWeapon(weapon)}
-                  className={`border-4 p-4 text-left transition-all weapon-list-item ${
+                  className={`hud-panel p-4 text-left transition-all relative hover:scale-105 ${
                     isSelected ? 'selected' : ''
                   }`}
                   style={{ 
                     imageRendering: 'pixelated',
-                    backgroundColor: isSelected ? rarityColor : '#5a0000',
-                    borderColor: rarityBorderColor,
+                    backgroundColor: isSelected ? rarityColor : 'rgba(0, 0, 0, 0.85)',
+                    '--hud-border-color': rarityBorderColor,
+                  } as React.CSSProperties}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.setProperty('--hud-border-color', rarityBorderColor);
+                    e.currentTarget.style.boxShadow = `0 0 10px ${rarityBorderColor}40, inset 0 0 10px ${rarityBorderColor}20`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = '';
                   }}
                 >
-                  <span className="text-white font-bold" style={{ fontSize: '20px', textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}>
+                  <div className="hud-corner hud-corner-tl" style={{ borderColor: rarityBorderColor }}></div>
+                  <div className="hud-corner hud-corner-tr" style={{ borderColor: rarityBorderColor }}></div>
+                  <div className="hud-corner hud-corner-bl" style={{ borderColor: rarityBorderColor }}></div>
+                  <div className="hud-corner hud-corner-br" style={{ borderColor: rarityBorderColor }}></div>
+                  <span className="hud-text font-bold" style={{ fontSize: '20px' }}>
                     {weapon.name.toUpperCase()}
                   </span>
                 </button>
@@ -186,8 +262,8 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
           </div>
           
           {loading && (
-            <div className="text-yellow-300 text-center mt-4 font-bold text-xl animate-pulse">
-              {t('loadingInventory')}
+            <div className="hud-text-warning text-center mt-4 font-bold text-xl animate-pulse">
+              LOADING INVENTORY...
             </div>
           )}
         </div>
@@ -196,17 +272,21 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
         <div className="w-2/3 p-6 pt-20 flex flex-col items-center justify-start overflow-y-auto flex-shrink-0 relative weapons-scrollable" style={{ zIndex: 10 }}>
           {selectedWeapon ? (
             <>
-              <h2 className="text-white mb-2 font-bold text-center" style={{ fontSize: '32px', textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}>
+              <h2 className="hud-text-accent mb-2 font-bold text-center" style={{ fontSize: '32px' }}>
                 {selectedWeapon.name.toUpperCase()}
               </h2>
               
               <div className="mb-4 mx-auto max-w-full px-4 text-center">
-                <div className="inline-block bg-black/60 border-2 border-yellow-500/50 px-4 py-2 rounded max-w-full overflow-hidden">
-                  <div className="text-yellow-300 text-xs font-bold font-mono whitespace-nowrap overflow-x-auto scrollbar-hide" style={{ textShadow: '1px 1px 0px rgba(0,0,0,0.8)' }}>
+                <div className="hud-panel px-4 py-2 relative inline-block max-w-full overflow-hidden">
+                  <div className="hud-corner hud-corner-tl"></div>
+                  <div className="hud-corner hud-corner-tr"></div>
+                  <div className="hud-corner hud-corner-bl"></div>
+                  <div className="hud-corner hud-corner-br"></div>
+                  <div className="hud-text-warning text-xs font-bold font-mono whitespace-nowrap overflow-x-auto scrollbar-hide">
                     {selectedWeapon.id?.startsWith('default-') 
-                      ? t('defaultWeapon') 
+                      ? '[DEFAULT WEAPON]' 
                       : selectedWeapon.id 
-                        ? t('nftId', { nftId: selectedWeapon.id })
+                        ? `NFT ID: ${selectedWeapon.id}`
                         : ''}
                   </div>
                 </div>
@@ -214,19 +294,21 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
 
               <div className="mb-2 text-center flex justify-center items-center gap-4">
                 <span 
-                  className="font-bold px-4 py-2 border-2 inline-block"
+                  className="hud-panel px-4 py-2 relative inline-block"
                   style={{
                     fontSize: '14px',
                     backgroundColor: getRarityColor(selectedWeapon.rarity),
-                    borderColor: getRarityBorderColor(selectedWeapon.rarity),
-                    color: '#ffffff',
-                    textShadow: '2px 2px 0px rgba(0,0,0,0.8)',
-                  }}
+                    '--hud-border-color': getRarityBorderColor(selectedWeapon.rarity),
+                  } as React.CSSProperties}
                 >
-                  {selectedWeapon.rarity.toUpperCase()}
+                  <div className="hud-corner hud-corner-tl"></div>
+                  <div className="hud-corner hud-corner-tr"></div>
+                  <div className="hud-corner hud-corner-bl"></div>
+                  <div className="hud-corner hud-corner-br"></div>
+                  <span className="hud-text font-bold">{selectedWeapon.rarity.toUpperCase()}</span>
                 </span>
                 
-                {selectedWeapon.id && !selectedWeapon.id.startsWith('default-') && (
+                {selectedWeapon.id && !selectedWeapon.id.startsWith('default-') && !selectedWeapon.id.startsWith('debug-') && (
                   <button
                     onClick={() => {
                       setRecipientAddress('');
@@ -234,10 +316,10 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
                       setTransferSuccess(false);
                       setShowTransferModal(true);
                     }}
-                    className="bg-[#8b0000] hover:bg-[#a00000] text-white font-bold py-2 px-4 border-2 border-[#ff0000] shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)] hover:shadow-none transition-all h-[38px] flex items-center"
-                    style={{ fontSize: '14px', imageRendering: 'pixelated' }}
+                    className="hud-button py-2 px-4 font-bold h-[38px] flex items-center"
+                    style={{ fontSize: '14px', imageRendering: 'pixelated', borderColor: 'rgba(255, 68, 68, 0.5)' }}
                   >
-                    {t('transfer')}
+                    <span className="hud-text-danger">TRANSFER</span>
                   </button>
                 )}
               </div>
@@ -251,28 +333,44 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
                 />
               </div>
 
-              <div className="text-white w-full px-4" style={{ fontSize: '18px' }}>
-                <div className="mb-3 p-3 border-4 border-white" style={{ backgroundColor: '#3a0000' }}>
-                  <span className="text-gray-300">{t('damage')}:</span> <span className="text-yellow-300 ml-2 font-bold">{selectedWeapon.baseDamage}</span>
+              <div className="w-full px-4" style={{ fontSize: '18px' }}>
+                <div className="mb-3 p-3 hud-panel relative">
+                  <div className="hud-corner hud-corner-tl"></div>
+                  <div className="hud-corner hud-corner-tr"></div>
+                  <div className="hud-corner hud-corner-bl"></div>
+                  <div className="hud-corner hud-corner-br"></div>
+                  <span className="hud-text-accent">DAMAGE:</span> <span className="hud-text-warning ml-2 font-bold">{selectedWeapon.baseDamage}</span>
                 </div>
-                <div className="mb-3 p-3 border-4 border-white" style={{ backgroundColor: '#3a0000' }}>
-                  <span className="text-gray-300">{t('firerate')}:</span> <span className="text-yellow-300 ml-2 font-bold">{calculateFirerate(selectedWeapon.cooldown).toFixed(5)}</span>
+                <div className="mb-3 p-3 hud-panel relative">
+                  <div className="hud-corner hud-corner-tl"></div>
+                  <div className="hud-corner hud-corner-tr"></div>
+                  <div className="hud-corner hud-corner-bl"></div>
+                  <div className="hud-corner hud-corner-br"></div>
+                  <span className="hud-text-accent">FIRERATE:</span> <span className="hud-text-warning ml-2 font-bold">{calculateFirerate(selectedWeapon.cooldown).toFixed(5)}</span>
                 </div>
                 {selectedWeapon.range && (
-                  <div className="mb-3 p-3 border-4 border-white" style={{ backgroundColor: '#3a0000' }}>
-                    <span className="text-gray-300">{t('range')}:</span> <span className="text-yellow-300 ml-2 font-bold">{selectedWeapon.range}</span>
+                  <div className="mb-3 p-3 hud-panel relative">
+                    <div className="hud-corner hud-corner-tl"></div>
+                    <div className="hud-corner hud-corner-tr"></div>
+                    <div className="hud-corner hud-corner-bl"></div>
+                    <div className="hud-corner hud-corner-br"></div>
+                    <span className="hud-text-accent">RANGE:</span> <span className="hud-text-warning ml-2 font-bold">{selectedWeapon.range}</span>
                   </div>
                 )}
-                <div className="mt-4 p-3 border-4 border-white" style={{ backgroundColor: '#3a0000' }}>
-                  <p className="text-cyan-300 font-bold" style={{ fontSize: '16px', lineHeight: '1.5' }}>
+                <div className="mt-4 p-3 hud-panel relative">
+                  <div className="hud-corner hud-corner-tl"></div>
+                  <div className="hud-corner hud-corner-tr"></div>
+                  <div className="hud-corner hud-corner-bl"></div>
+                  <div className="hud-corner hud-corner-br"></div>
+                  <p className="hud-text-accent font-bold" style={{ fontSize: '16px', lineHeight: '1.5' }}>
                     {selectedWeapon.description.toUpperCase()}
                   </p>
                 </div>
               </div>
             </>
           ) : (
-            <div className="text-gray-400 text-center" style={{ fontSize: '24px' }}>
-              {t('selectWeaponToViewDetails')}
+            <div className="hud-text-accent text-center" style={{ fontSize: '24px' }}>
+              SELECT A WEAPON TO VIEW DETAILS
             </div>
           )}
         </div>
@@ -281,35 +379,44 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
       {/* Transfer Modal */}
       {showTransferModal && (
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 font-['Pixelify_Sans']">
-          <div className="bg-[#3a0000] border-4 border-white p-8 max-w-md w-full mx-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.5)]" style={{ imageRendering: 'pixelated' }}>
-            <h3 className="text-white text-3xl font-bold mb-6 text-center border-b-4 border-white pb-4">{t('transferNft')}</h3>
+          <div className="hud-panel p-8 max-w-md w-full mx-4 relative" style={{ imageRendering: 'pixelated' }}>
+            <div className="hud-corner hud-corner-tl"></div>
+            <div className="hud-corner hud-corner-tr"></div>
+            <div className="hud-corner hud-corner-bl"></div>
+            <div className="hud-corner hud-corner-br"></div>
+            <h3 className="hud-text-accent text-3xl font-bold mb-6 text-center border-b-2 border-cyan-500/50 pb-4">TRANSFER NFT</h3>
             
             {transferSuccess ? (
               <div className="text-center py-4">
-                <div className="text-green-400 text-2xl mb-4 font-bold">{t('transferSuccessful')}</div>
-                <p className="text-white text-lg mb-6">{t('weaponSent')}</p>
+                <div className="hud-text-success text-2xl mb-4 font-bold">TRANSFER SUCCESSFUL!</div>
+                <p className="hud-text text-lg mb-6">The weapon has been sent to the recipient.</p>
               </div>
             ) : (
               <>
-                <p className="text-white mb-6 text-lg text-center">
-                  {t('enterRecipientAddress')} 
+                <p className="hud-text mb-6 text-lg text-center">
+                  Enter the recipient's OneChain address below. 
                   <br/>
-                  <span className="text-[#ff5555] font-bold mt-2 block">{t('warningCannotBeUndone')}</span>
+                  <span className="hud-text-danger font-bold mt-2 block">WARNING: THIS ACTION CANNOT BE UNDONE!</span>
                 </p>
                 
                 <div className="mb-8">
-                  <label className="block text-white text-lg font-bold mb-2">{t('recipientAddress')}</label>
+                  <label className="block hud-text-accent text-lg font-bold mb-2">RECIPIENT ADDRESS</label>
                   <input
                     type="text"
                     value={recipientAddress}
                     onChange={(e) => setRecipientAddress(e.target.value)}
-                    placeholder={t('addressPlaceholder')}
-                    className="w-full bg-black border-4 border-white text-white p-4 focus:border-yellow-400 outline-none font-mono text-lg placeholder-gray-600"
+                    placeholder="0x..."
+                    className="w-full hud-panel p-4 hud-text font-mono text-lg placeholder-gray-600 outline-none relative"
+                    style={{ borderColor: 'rgba(0, 200, 255, 0.5)' }}
                   />
                 </div>
 
                 {transferError && (
-                  <div className="mb-6 text-[#ff5555] text-lg border-4 border-[#ff5555] bg-black/50 p-4 font-bold text-center">
+                  <div className="mb-6 hud-text-danger text-lg hud-panel p-4 font-bold text-center relative" style={{ '--hud-border-color': 'rgba(255, 68, 68, 0.6)' } as React.CSSProperties}>
+                    <div className="hud-corner hud-corner-tl"></div>
+                    <div className="hud-corner hud-corner-tr"></div>
+                    <div className="hud-corner hud-corner-bl"></div>
+                    <div className="hud-corner hud-corner-br"></div>
                     {transferError}
                   </div>
                 )}
@@ -317,19 +424,19 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
                 <div className="flex gap-6 justify-center">
                   <button
                     onClick={() => setShowTransferModal(false)}
-                    className="bg-[#5a0000] hover:bg-[#7a0000] text-white font-bold py-3 px-8 border-4 border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] hover:translate-y-1 hover:shadow-none transition-all"
+                    className="hud-button py-3 px-8 font-bold"
                     disabled={isTransferring}
-                    style={{ fontSize: '18px' }}
+                    style={{ fontSize: '18px', borderColor: 'rgba(0, 200, 255, 0.5)' }}
                   >
-                    {t('cancel')}
+                    <span className="hud-text">CANCEL</span>
                   </button>
                   <button
                     onClick={handleTransfer}
                     disabled={!recipientAddress || isTransferring}
-                    className="bg-green-700 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-8 border-4 border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] hover:translate-y-1 hover:shadow-none transition-all"
-                    style={{ fontSize: '18px' }}
+                    className="hud-button py-3 px-8 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ fontSize: '18px', borderColor: 'rgba(0, 255, 136, 0.5)' }}
                   >
-                    {isTransferring ? t('sending') : t('confirm')}
+                    <span className="hud-text-success">{isTransferring ? 'SENDING...' : 'CONFIRM'}</span>
                   </button>
                 </div>
               </>

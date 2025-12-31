@@ -12,13 +12,15 @@ export interface PlayerStats {
   attackSpeed: number;
   projectileSize: number;
   knockback: number;
-  cooldownReduction: number;
+  cooldownReduction: number; // Reduces weapon cooldown
+  abilityCooldownReduction: number; // Reduces ability cooldown
 }
 
 export enum EnemyType {
   WEAK = 'weak',
   NORMAL = 'normal',
   STRONG = 'strong',
+  LAZER = 'lazer',
 }
 
 export interface Enemy {
@@ -40,6 +42,15 @@ export interface Enemy {
   baseSize?: number; // Original size before berserker mode
   isBurning?: boolean; // If true, enemy is being burned by fire ring
   burnEndTime?: number; // Timestamp when burn effect expires (for persistent burn)
+  lightningBeamStartTime?: number; // When lightning attack started (for LAZER enemies)
+  lightningBeamPath?: Position[]; // Path of the lightning (enemy -> enemies -> player)
+  lightningBeamEndTime?: number; // When lightning expires
+  majorAttackChargeStartTime?: number; // When major attack charging started (for LAZER enemies)
+  majorAttackTeleportTime?: number; // When enemy teleports (for LAZER enemies)
+  majorAttackBeamStartTime?: number; // When energy beam starts (for LAZER enemies)
+  majorAttackBeamEndTime?: number; // When energy beam ends (for LAZER enemies)
+  majorAttackBeamAngle?: number; // Angle of the energy beam
+  lastMajorAttackEndTime?: number; // Persistent: when last major attack ended (for cooldown tracking)
 }
 
 export interface Projectile {
@@ -131,6 +142,42 @@ export interface VestPickup {
   blueHealthAmount: number;
   size: number;
   life: number; // For animation/pulsing effect
+}
+
+export interface Explosion {
+  id: string;
+  position: Position;
+  startTime: number;
+  size: number;
+}
+
+export interface LaserBeam {
+  id: string;
+  startPosition: Position; // Enemy position when beam was fired
+  angle: number; // Angle of the beam (in radians)
+  startTime: number; // When beam was created
+  endTime: number; // When beam expires
+  damage: number; // Damage per frame while in beam
+  enemyId: string; // ID of enemy that created this beam
+}
+
+export interface LightningBeam {
+  id: string;
+  path: Position[]; // Array of positions for zigzag lightning path (enemy -> enemies -> player)
+  startTime: number; // When lightning was created
+  endTime: number; // When lightning expires
+  damage: number; // Damage dealt by lightning
+  enemyId: string; // ID of enemy that created this lightning
+}
+
+export interface EnergyBeam {
+  id: string;
+  startPosition: Position; // Enemy position when beam was fired
+  angle: number; // Angle of the beam (in radians)
+  startTime: number; // When beam was created
+  endTime: number; // When beam expires
+  damage: number; // Damage per frame while in beam
+  enemyId: string; // ID of enemy that created this beam
 }
 
 export enum ActiveAbilityType {

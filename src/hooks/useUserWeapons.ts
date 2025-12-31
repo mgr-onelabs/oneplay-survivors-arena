@@ -4,7 +4,6 @@ import { Weapon, WeaponType, WeaponRarity } from '../types/game';
 
 const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || '0x5f3894f6e1bb292ca51e15f3f7d9e9ce2aac138b85171b5eafa21f8c3b2415af';
 const WEAPON_NFT_TYPE = `${PACKAGE_ID}::weapon_nft::WeaponNFT`;
-
 export const useUserWeapons = () => {
   const { connected, address, client } = useOneWallet();
   const [weapons, setWeapons] = useState<Weapon[]>([]);

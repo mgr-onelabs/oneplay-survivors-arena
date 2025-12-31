@@ -1,13 +1,18 @@
-import { Enemy, Position, EnemyType, Projectile } from '../types/game';
+import { Enemy, Position, EnemyType, Projectile, LaserBeam, LightningBeam, EnergyBeam } from '../types/game';
 import { generateId, normalize, distance } from '../utils/gameUtils';
 import { GAME_BALANCE } from '../data/gameBalance';
 
 export class EnemyManager {
   private enemies: Enemy[] = [];
   private enemyProjectiles: Projectile[] = [];
+  private laserBeams: LaserBeam[] = [];
+  private lightningBeams: LightningBeam[] = [];
+  private energyBeams: EnergyBeam[] = [];
   private canvasWidth: number;
   private canvasHeight: number;
   private spawnedEnemiesThisWave: number = 0;
+  private spawnedLazerEnemiesThisWave: number = 0; // Track lazer enemies spawned this wave
+  private lastGlobalMajorAttackTime: number = 0; // Global cooldown for LAZER major attacks
   private targetEnemyCount: number = 0;
   private currentWave: number = 0;
   private lastSpawnTime: number = 0;
@@ -23,8 +28,9 @@ export class EnemyManager {
   private onNormalEnemyDied?: () => void;
   private onShieldBlocked?: () => void;
   private onEnemySplit?: () => void;
+  private onEnergyBeamFired?: () => void;
 
-  constructor(canvasWidth: number, canvasHeight: number, onProjectileFired?: () => void, onBerserkerActivated?: () => void, onChargingStarted?: () => void, onChargingStopped?: () => void, onChargedShotFired?: () => void, onWeakEnemyExploded?: () => void, onNormalEnemyDied?: () => void, onShieldBlocked?: () => void, onEnemySplit?: () => void) {
+  constructor(canvasWidth: number, canvasHeight: number, onProjectileFired?: () => void, onBerserkerActivated?: () => void, onChargingStarted?: () => void, onChargingStopped?: () => void, onChargedShotFired?: () => void, onWeakEnemyExploded?: () => void, onNormalEnemyDied?: () => void, onShieldBlocked?: () => void, onEnemySplit?: () => void, onEnergyBeamFired?: () => void) {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
     this.onProjectileFired = onProjectileFired;
@@ -36,11 +42,13 @@ export class EnemyManager {
     this.onNormalEnemyDied = onNormalEnemyDied;
     this.onShieldBlocked = onShieldBlocked;
     this.onEnemySplit = onEnemySplit;
+    this.onEnergyBeamFired = onEnergyBeamFired;
   }
 
   spawnWave(wave: number, playerPos?: Position, mousePos?: Position): void {
     // Reset counter for new wave
     this.spawnedEnemiesThisWave = 0;
+    this.spawnedLazerEnemiesThisWave = 0; // Reset lazer enemy counter
     this.currentWave = wave;
     this.lastSpawnTime = Date.now();
     
@@ -64,23 +72,33 @@ export class EnemyManager {
     // Distribute enemy types based on wave
     // Early waves: more weak enemies
     // Later waves: more strong enemies
+    // LAZER enemies spawn starting from wave 3
+    // BUT: Limit active LAZER enemies to prevent unplayable situations
     const rand = Math.random();
+    
+    // Count currently active LAZER enemies
+    const activeLazerCount = this.enemies.filter(e => e.type === EnemyType.LAZER).length;
+    const maxLazerEnemies = GAME_BALANCE.enemies.attack.maxActiveLazerEnemies;
+    const canSpawnLazer = activeLazerCount < maxLazerEnemies;
     
     const dist = GAME_BALANCE.waves.distribution;
     if (wave <= 3) {
-      // Waves 1-3
+      // Waves 1-3 - small chance of LAZER starting wave 3
+      if (wave >= 3 && rand < 0.05 && canSpawnLazer) return EnemyType.LAZER; // 5% chance in wave 3
       if (rand < dist.waves1to3.weak) return EnemyType.WEAK;
       if (rand < dist.waves1to3.weak + dist.waves1to3.normal) return EnemyType.NORMAL;
       return EnemyType.STRONG;
     } else if (wave <= 6) {
-      // Waves 4-6
-      if (rand < dist.waves4to6.weak) return EnemyType.WEAK;
-      if (rand < dist.waves4to6.weak + dist.waves4to6.normal) return EnemyType.NORMAL;
+      // Waves 4-6 - more LAZER enemies (only if under limit)
+      if (rand < 0.1 && canSpawnLazer) return EnemyType.LAZER; // 10% chance
+      if (rand < 0.1 + dist.waves4to6.weak) return EnemyType.WEAK;
+      if (rand < 0.1 + dist.waves4to6.weak + dist.waves4to6.normal) return EnemyType.NORMAL;
       return EnemyType.STRONG;
     } else {
-      // Waves 7+
-      if (rand < dist.waves7Plus.weak) return EnemyType.WEAK;
-      if (rand < dist.waves7Plus.weak + dist.waves7Plus.normal) return EnemyType.NORMAL;
+      // Waves 7+ - even more LAZER enemies (only if under limit)
+      if (rand < 0.15 && canSpawnLazer) return EnemyType.LAZER; // 15% chance
+      if (rand < 0.15 + dist.waves7Plus.weak) return EnemyType.WEAK;
+      if (rand < 0.15 + dist.waves7Plus.weak + dist.waves7Plus.normal) return EnemyType.NORMAL;
       return EnemyType.STRONG;
     }
   }
@@ -108,6 +126,13 @@ export class EnemyManager {
           speed: baseSpeed * config.strong.speedMultiplier,
           damage: Math.floor(baseDamage * config.strong.damageMultiplier),
           size: config.strong.size,
+        };
+      case EnemyType.LAZER:
+        return {
+          health: Math.max(4, Math.floor(baseHealth * config.lazer.healthMultiplier)), // Minimum 4 health
+          speed: baseSpeed * config.lazer.speedMultiplier,
+          damage: Math.floor(baseDamage * config.lazer.damageMultiplier),
+          size: config.lazer.size,
         };
       default:
         return {
@@ -150,12 +175,14 @@ export class EnemyManager {
 
     // Spawn enemies outside visible frame from all directions around the player
     // Prioritize spawning behind the player (opposite of mouse direction)
-    const spawnDistance = 700; // Distance outside visible area
+    // Calculate safe spawn distance - must be well outside visible area
+    const safeMargin = 250; // Large margin to ensure enemies are never visible when spawning
+    const spawnDistance = Math.max(this.canvasWidth, this.canvasHeight) / 2 + safeMargin;
     let x: number, y: number;
 
     if (playerPos) {
       // Calculate visible area bounds (camera view) with extra margin to ensure enemies are completely off-screen
-      const margin = 100; // Extra margin to ensure enemies are fully off-screen
+      const margin = 150; // Extra margin to ensure enemies are fully off-screen
       const viewLeft = playerPos.x - this.canvasWidth / 2 - margin;
       const viewRight = playerPos.x + this.canvasWidth / 2 + margin;
       const viewTop = playerPos.y - this.canvasHeight / 2 - margin;
@@ -244,27 +271,34 @@ export class EnemyManager {
       }
     } else {
       // Fallback to old method if no player position (shouldn't happen)
+      // Spawn far outside visible area
       const side = Math.floor(Math.random() * 4);
+      const farDistance = spawnDistance + 100;
       switch (side) {
         case 0:
           x = Math.random() * this.canvasWidth;
-          y = -50;
+          y = -farDistance;
           break;
         case 1:
-          x = this.canvasWidth + 50;
+          x = this.canvasWidth + farDistance;
           y = Math.random() * this.canvasHeight;
           break;
         case 2:
           x = Math.random() * this.canvasWidth;
-          y = this.canvasHeight + 50;
+          y = this.canvasHeight + farDistance;
           break;
         default:
-          x = -50;
+          x = -farDistance;
           y = Math.random() * this.canvasHeight;
       }
     }
 
     this.spawnedEnemiesThisWave++;
+    
+    // Track lazer enemies spawned this wave (for testing in wave 1)
+    if (enemyType === EnemyType.LAZER) {
+      this.spawnedLazerEnemiesThisWave++;
+    }
 
     this.enemies.push({
       id: generateId(),
@@ -348,16 +382,23 @@ export class EnemyManager {
         }
       }
 
-      const direction = normalize({
-        x: playerPos.x - enemy.position.x,
-        y: playerPos.y - enemy.position.y,
-      });
+      // LAZER enemies don't move while charging major attack or firing energy beam
+      if (enemy.type === EnemyType.LAZER && 
+          ((enemy.majorAttackChargeStartTime && !enemy.majorAttackTeleportTime) || 
+           (enemy.majorAttackBeamStartTime && currentTime < enemy.majorAttackBeamEndTime!))) {
+        // Enemy stands still while charging major attack or firing energy beam - skip movement
+      } else {
+        const direction = normalize({
+          x: playerPos.x - enemy.position.x,
+          y: playerPos.y - enemy.position.y,
+        });
 
-      // Apply berserker speed multiplier
-      const berserkerSpeedMultiplier = enemy.isBerserker ? 1.0 : 1.0; // Already applied above
-      const moveSpeed = enemy.speed * speedMultiplier * berserkerSpeedMultiplier * (deltaTime / 16);
-      enemy.position.x += direction.x * moveSpeed;
-      enemy.position.y += direction.y * moveSpeed;
+        // Apply berserker speed multiplier
+        const berserkerSpeedMultiplier = enemy.isBerserker ? 1.0 : 1.0; // Already applied above
+        const moveSpeed = enemy.speed * speedMultiplier * berserkerSpeedMultiplier * (deltaTime / 16);
+        enemy.position.x += direction.x * moveSpeed;
+        enemy.position.y += direction.y * moveSpeed;
+      }
 
       // Normal enemies shoot projectiles at the player
       if (enemy.type === EnemyType.NORMAL) {
@@ -418,20 +459,145 @@ export class EnemyManager {
           enemy.chargeTargetPos = undefined;
         }
       }
+
+      // LAZER enemies fire lightning that bounces between nearby enemies
+      if (enemy.type === EnemyType.LAZER) {
+        // Clean up expired lightning state
+        if (enemy.lightningBeamEndTime && currentTime >= enemy.lightningBeamEndTime) {
+          enemy.lightningBeamStartTime = undefined;
+          enemy.lightningBeamPath = undefined;
+          enemy.lightningBeamEndTime = undefined;
+        }
+        
+        const distToPlayer = distance(enemy.position, playerPos);
+        const lightningCooldown = attackConfig.lightningCooldown;
+        
+        // Clean up expired major attack state
+        if (enemy.majorAttackBeamEndTime && currentTime >= enemy.majorAttackBeamEndTime) {
+          // Store when attack ended for cooldown tracking (persistent, don't clear)
+          enemy.lastMajorAttackEndTime = currentTime;
+          
+          enemy.majorAttackChargeStartTime = undefined;
+          enemy.majorAttackTeleportTime = undefined;
+          enemy.majorAttackBeamStartTime = undefined;
+          enemy.majorAttackBeamEndTime = undefined;
+          enemy.majorAttackBeamAngle = undefined;
+        }
+        
+        const majorAttackCooldown = attackConfig.majorAttackCooldown;
+        const majorAttackChargeTime = attackConfig.majorAttackChargeTime;
+        const majorAttackBeamDuration = attackConfig.majorAttackBeamDuration;
+        
+        // Major attack: charge -> teleport -> energy beam
+        // Check if major attack is ready (separate cooldown from lightning)
+        // Use persistent lastMajorAttackEndTime for proper cooldown tracking
+        const lastMajorAttackTime = enemy.lastMajorAttackEndTime || 0;
+        
+        // Check if enemy is visible on screen (within player's viewport)
+        const halfWidth = this.canvasWidth / 2;
+        const halfHeight = this.canvasHeight / 2;
+        const isEnemyVisible = enemy.position.x >= playerPos.x - halfWidth &&
+                               enemy.position.x <= playerPos.x + halfWidth &&
+                               enemy.position.y >= playerPos.y - halfHeight &&
+                               enemy.position.y <= playerPos.y + halfHeight;
+        
+        // Check if any other LAZER enemy is currently using major attack (charging, teleporting, or firing)
+        const anyLazerUsingMajorAttack = this.enemies.some(e => 
+          e.type === EnemyType.LAZER && 
+          e.id !== enemy.id && 
+          (e.majorAttackChargeStartTime || e.majorAttackTeleportTime || e.majorAttackBeamStartTime)
+        );
+        
+        // Global cooldown between major attacks (3 seconds between different LAZER enemies)
+        const globalMajorAttackCooldown = 3000;
+        const globalCooldownReady = currentTime - this.lastGlobalMajorAttackTime >= globalMajorAttackCooldown;
+        
+        const canUseMajorAttack = !enemy.majorAttackChargeStartTime && 
+                                  !enemy.majorAttackTeleportTime && 
+                                  !enemy.majorAttackBeamStartTime &&
+                                  (currentTime - lastMajorAttackTime >= majorAttackCooldown) &&
+                                  isEnemyVisible && // Only use major attack if visible to player
+                                  !anyLazerUsingMajorAttack && // Only one LAZER can use major attack at a time
+                                  globalCooldownReady; // Global cooldown between major attacks
+        
+        if (canUseMajorAttack && distToPlayer <= attackRange * 1.5) {
+          // Start charging for major attack
+          enemy.majorAttackChargeStartTime = currentTime;
+          this.lastGlobalMajorAttackTime = currentTime; // Update global cooldown
+        }
+        
+        // If charging, check if charge is complete
+        if (enemy.majorAttackChargeStartTime && !enemy.majorAttackTeleportTime && mousePos) {
+          if (currentTime - enemy.majorAttackChargeStartTime >= majorAttackChargeTime) {
+            // Charge complete - teleport behind player
+            const teleportDistance = 400; // Distance behind player
+            const angle = Math.atan2(mousePos.y - playerPos.y, mousePos.x - playerPos.x);
+            const behindAngle = angle + Math.PI; // 180 degrees opposite
+            
+            // Teleport behind player
+            enemy.position.x = playerPos.x + Math.cos(behindAngle) * teleportDistance;
+            enemy.position.y = playerPos.y + Math.sin(behindAngle) * teleportDistance;
+            
+            enemy.majorAttackTeleportTime = currentTime;
+            // Beam will start after delay (see below)
+          }
+        }
+        
+        // After teleport, wait 500ms before firing beam (gives player time to react)
+        const beamWindupDelay = 500; // Half second delay after teleport
+        if (enemy.majorAttackTeleportTime && !enemy.majorAttackBeamStartTime) {
+          if (currentTime - enemy.majorAttackTeleportTime >= beamWindupDelay) {
+            // Calculate beam angle towards current player position
+            const beamAngle = Math.atan2(
+              playerPos.y - enemy.position.y,
+              playerPos.x - enemy.position.x
+            );
+            
+            enemy.majorAttackBeamStartTime = currentTime;
+            enemy.majorAttackBeamAngle = beamAngle;
+            enemy.majorAttackBeamEndTime = currentTime + majorAttackBeamDuration;
+            
+            // Create energy beam
+            this.createEnergyBeam(enemy, beamAngle, currentTime);
+          }
+        }
+        
+        // Regular lightning attack (only if not using major attack)
+        if (!enemy.majorAttackChargeStartTime && !enemy.majorAttackBeamStartTime) {
+          // Attack if within range and not already firing (no charge time, only cooldown)
+          if (distToPlayer <= attackRange && !enemy.lightningBeamStartTime) {
+            // Check cooldown and fire immediately
+            if (!enemy.lastAttackTime || currentTime - enemy.lastAttackTime >= lightningCooldown) {
+              // Create lightning path: enemy -> nearby enemies -> player
+              const lightningPath = this.createLightningPath(enemy, playerPos);
+              
+              enemy.lightningBeamStartTime = currentTime;
+              enemy.lightningBeamPath = lightningPath;
+              enemy.lightningBeamEndTime = currentTime + attackConfig.lightningDuration;
+              enemy.lastAttackTime = currentTime;
+              
+              // Create lightning beam
+              this.createLightningBeam(enemy, lightningPath, currentTime);
+            }
+          }
+        }
+      }
     });
 
     // Respawn enemies that are too far from player (behind the player)
+    // Calculate safe spawn distance - must be outside visible area
+    const safeSpawnDistance = Math.max(this.canvasWidth, this.canvasHeight) / 2 + 200; // Always outside visible + 200px buffer
+    
     enemiesToRespawn.forEach((enemy) => {
       // Respawn behind player
       if (mousePos) {
-        const spawnDistance = 700;
         const angle = Math.atan2(mousePos.y - playerPos.y, mousePos.x - playerPos.x);
         const behindAngle = angle + Math.PI; // 180 degrees opposite
         
-        // Spawn behind player with some random offset
+        // Spawn behind player with some random offset, always outside visible area
         const randomOffset = (Math.random() - 0.5) * 400; // Random offset up to 200 units
-        enemy.position.x = playerPos.x + Math.cos(behindAngle) * spawnDistance + Math.cos(behindAngle + Math.PI / 2) * randomOffset;
-        enemy.position.y = playerPos.y + Math.sin(behindAngle) * spawnDistance + Math.sin(behindAngle + Math.PI / 2) * randomOffset;
+        enemy.position.x = playerPos.x + Math.cos(behindAngle) * safeSpawnDistance + Math.cos(behindAngle + Math.PI / 2) * randomOffset;
+        enemy.position.y = playerPos.y + Math.sin(behindAngle) * safeSpawnDistance + Math.sin(behindAngle + Math.PI / 2) * randomOffset;
         
         // Reset enemy state
         if (enemy.chargeStartTime) {
@@ -445,12 +611,11 @@ export class EnemyManager {
         enemy.lastAttackTime = 0;
       } else {
         // Fallback: spawn at a random position behind player (opposite of player's last known direction)
-        const spawnDistance = 700;
         const randomAngle = Math.random() * Math.PI * 2;
         // Spawn in a semi-circle behind player (180 degrees)
         const behindAngle = randomAngle + Math.PI;
-        enemy.position.x = playerPos.x + Math.cos(behindAngle) * spawnDistance;
-        enemy.position.y = playerPos.y + Math.sin(behindAngle) * spawnDistance;
+        enemy.position.x = playerPos.x + Math.cos(behindAngle) * safeSpawnDistance;
+        enemy.position.y = playerPos.y + Math.sin(behindAngle) * safeSpawnDistance;
         
         // Reset enemy state
         if (enemy.chargeStartTime) {
@@ -467,6 +632,123 @@ export class EnemyManager {
 
     // Update enemy projectiles
     this.updateEnemyProjectiles(deltaTime, playerPos);
+    
+    // Update laser beams (remove expired ones)
+    this.updateLaserBeams(currentTime);
+    
+    // Update lightning beams (remove expired ones)
+    this.updateLightningBeams(currentTime);
+    
+    // Update energy beams (remove expired ones)
+    this.updateEnergyBeams(currentTime);
+  }
+
+  private createLaserBeam(enemy: Enemy, angle: number, startTime: number): void {
+    const attackConfig = GAME_BALANCE.enemies.attack;
+    const beam: LaserBeam = {
+      id: generateId(),
+      startPosition: { ...enemy.position },
+      angle: angle,
+      startTime: startTime,
+      endTime: startTime + attackConfig.laserBeamDuration,
+      damage: attackConfig.laserBeamDamage,
+      enemyId: enemy.id,
+    };
+    this.laserBeams.push(beam);
+  }
+
+  private updateLaserBeams(currentTime: number): void {
+    // Remove expired laser beams
+    this.laserBeams = this.laserBeams.filter(beam => currentTime < beam.endTime);
+  }
+
+  getLaserBeams(): LaserBeam[] {
+    return this.laserBeams;
+  }
+
+  private createLightningPath(enemy: Enemy, playerPos: Position): Position[] {
+    const path: Position[] = [enemy.position]; // Start from enemy
+    
+    // Find nearby enemies (excluding self and other lazer enemies)
+    const lightningRange = GAME_BALANCE.enemies.attack.lightningBounceRange || 300;
+    const nearbyEnemies = this.enemies.filter(e => 
+      e.id !== enemy.id && 
+      e.type !== EnemyType.LAZER &&
+      distance(enemy.position, e.position) <= lightningRange
+    );
+    
+    // Sort by distance and take up to 3 nearby enemies for bouncing
+    nearbyEnemies.sort((a, b) => 
+      distance(enemy.position, a.position) - distance(enemy.position, b.position)
+    );
+    const bounceEnemies = nearbyEnemies.slice(0, 3);
+    
+    // Create zigzag path through nearby enemies
+    let currentPos = enemy.position;
+    const usedEnemies = new Set<string>();
+    
+    for (const bounceEnemy of bounceEnemies) {
+      if (!usedEnemies.has(bounceEnemy.id)) {
+        path.push(bounceEnemy.position);
+        currentPos = bounceEnemy.position;
+        usedEnemies.add(bounceEnemy.id);
+      }
+    }
+    
+    // Always end at player
+    path.push(playerPos);
+    
+    return path;
+  }
+
+  private createLightningBeam(enemy: Enemy, path: Position[], startTime: number): void {
+    const attackConfig = GAME_BALANCE.enemies.attack;
+    const beam: LightningBeam = {
+      id: generateId(),
+      path: path,
+      startTime: startTime,
+      endTime: startTime + attackConfig.lightningDuration,
+      damage: attackConfig.lightningDamage,
+      enemyId: enemy.id,
+    };
+    this.lightningBeams.push(beam);
+  }
+
+  private updateLightningBeams(currentTime: number): void {
+    // Remove expired lightning beams
+    this.lightningBeams = this.lightningBeams.filter(beam => currentTime < beam.endTime);
+  }
+
+  getLightningBeams(): LightningBeam[] {
+    return this.lightningBeams;
+  }
+
+  private createEnergyBeam(enemy: Enemy, angle: number, startTime: number): void {
+    const attackConfig = GAME_BALANCE.enemies.attack;
+    const beam: EnergyBeam = {
+      id: generateId(),
+      startPosition: { ...enemy.position }, // Use current enemy position (after teleport)
+      angle: angle,
+      startTime: startTime,
+      endTime: startTime + attackConfig.majorAttackBeamDuration,
+      damage: attackConfig.majorAttackBeamDamage,
+      enemyId: enemy.id,
+    };
+    this.energyBeams.push(beam);
+    
+    // Play energy beam sound effect
+    if (this.onEnergyBeamFired) {
+      this.onEnergyBeamFired();
+    }
+  }
+
+  private updateEnergyBeams(currentTime: number): void {
+    // Remove expired energy beams
+    this.energyBeams = this.energyBeams.filter(beam => currentTime < beam.endTime);
+  }
+
+  getEnergyBeams(): EnergyBeam[] {
+    return this.energyBeams;
   }
 
   private shootChargedShot(enemy: Enemy, playerPos: Position): void {
@@ -784,7 +1066,12 @@ export class EnemyManager {
   clear(): void {
     this.enemies = [];
     this.enemyProjectiles = [];
+    this.laserBeams = [];
+    this.lightningBeams = [];
+    this.energyBeams = [];
     this.spawnedEnemiesThisWave = 0;
+    this.spawnedLazerEnemiesThisWave = 0;
+    this.lastGlobalMajorAttackTime = 0;
     this.targetEnemyCount = 0;
     this.currentWave = 0;
     this.lastSpawnTime = 0;

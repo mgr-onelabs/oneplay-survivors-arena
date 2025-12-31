@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
 import MainMenu from './components/MainMenu';
 import WeaponSelection from './components/WeaponSelection';
 import GameCanvas from './components/GameCanvas';
@@ -14,36 +13,35 @@ import { useUserWeapons } from './hooks/useUserWeapons';
 
 type AppScreen = 'mainMenu' | 'weaponSelection' | 'game' | 'inventory' | 'dailyChest' | 'achievements' | 'guide';
 
+const DEFAULT_WEAPONS: Weapon[] = [
+  {
+    id: 'default-pistol',
+    type: WeaponType.PISTOL,
+    rarity: WeaponRarity.COMMON,
+    name: 'Standard Plasma Sidearm',
+    description: 'Standard-issue plasma sidearm. Reliable targeting systems with consistent fire rate. Basic operator equipment.',
+    baseDamage: 25,
+    cooldown: 500,
+    range: 400
+  },
+  {
+    id: 'default-sword',
+    type: WeaponType.SWORD,
+    rarity: WeaponRarity.COMMON,
+    name: 'Standard HF Blade',
+    description: 'Standard high-frequency blade. High damage output but limited range. Basic melee weapon.',
+    baseDamage: 25,
+    cooldown: 400,
+    range: 100
+  }
+];
+
 function AppContent() {
-  const { t } = useTranslation(); // Initialize useTranslation
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('mainMenu');
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const { stopMusic, resumeMusic } = useMusic();
-
-  const DEFAULT_WEAPONS: Weapon[] = [
-    {
-      id: 'default-pistol',
-      type: WeaponType.PISTOL,
-      rarity: WeaponRarity.COMMON,
-      name: t('weapons.default_pistol.name'),
-      description: t('weapons.default_pistol.description'),
-      baseDamage: 25,
-      cooldown: 500,
-      range: 400
-    },
-    {
-      id: 'default-sword',
-      type: WeaponType.SWORD,
-      rarity: WeaponRarity.COMMON,
-      name: t('weapons.default_sword.name'),
-      description: t('weapons.default_sword.description'),
-      baseDamage: 25,
-      cooldown: 400,
-      range: 100
-    }
-  ];
-
+  
   // Check for mobile device on mount and resize
   useState(() => {
     const checkMobile = () => {
@@ -126,29 +124,29 @@ function AppContent() {
               textShadow: '2px 2px 0px rgba(0,0,0,0.5)'
             }}
           >
-            {t('mobile.desktopOnly')}
+            DESKTOP ONLY
           </h2>
           
           <p className="text-white text-xl mb-6 leading-relaxed">
-            {t('mobile.mouseAndKeyboard')}
+            This game is designed for mouse and keyboard controls.
           </p>
           
           <div className="bg-black/50 border-2 border-white/20 p-4 rounded mb-6">
-            <p className="text-yellow-300 font-bold mb-2">{t('mobile.requiredInputs')}</p>
+            <p className="text-yellow-300 font-bold mb-2">REQUIRED INPUTS:</p>
             <div className="flex justify-center gap-6 text-sm text-gray-300">
               <div className="flex flex-col items-center">
                 <span className="border border-white/30 px-2 py-1 rounded bg-white/10 mb-1">WASD</span>
-                <span>{t('mobile.move')}</span>
+                <span>MOVE</span>
               </div>
               <div className="flex flex-col items-center">
                 <span className="border border-white/30 px-2 py-1 rounded bg-white/10 mb-1">MOUSE</span>
-                <span>{t('mobile.aim')}</span>
+                <span>AIM</span>
               </div>
             </div>
           </div>
 
           <p className="text-gray-400 text-sm">
-            {t('mobile.openOnPC')}
+            Please open this link on a PC or Mac to play.
           </p>
         </div>
       </div>
@@ -217,3 +215,4 @@ function App() {
 }
 
 export default App;
+

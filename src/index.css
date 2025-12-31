@@ -25,33 +25,384 @@ body {
   font-size: 8px;
 }
 
-/* Custom scrollbar styling for dark theme */
+/* Custom scrollbar styling for HUD theme */
 ::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a0000;
-  border: 2px solid #3a0000;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #5a0000;
-  border: 2px solid #3a0000;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 200, 255, 0.2);
   border-radius: 0;
 }
 
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(0, 200, 255, 0.4) 0%, rgba(0, 150, 200, 0.5) 100%);
+  border: 1px solid rgba(0, 200, 255, 0.6);
+  border-radius: 0;
+  box-shadow: 
+    inset 0 0 4px rgba(0, 200, 255, 0.3),
+    0 0 2px rgba(0, 200, 255, 0.2);
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #7a0000;
+  background: linear-gradient(135deg, rgba(0, 200, 255, 0.6) 0%, rgba(0, 150, 200, 0.7) 100%);
+  border-color: rgba(0, 200, 255, 0.9);
+  box-shadow: 
+    inset 0 0 6px rgba(0, 200, 255, 0.5),
+    0 0 4px rgba(0, 200, 255, 0.4);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, rgba(0, 200, 255, 0.8) 0%, rgba(0, 150, 200, 0.9) 100%);
 }
 
 ::-webkit-scrollbar-corner {
-  background: #1a0000;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 200, 255, 0.2);
 }
 
 /* Firefox scrollbar styling */
 * {
-  scrollbar-width: thick;
-  scrollbar-color: #5a0000 #1a0000;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 200, 255, 0.5) rgba(0, 0, 0, 0.6);
+}
+
+/* Futuristic Robot HUD UI Styles */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes dataFlow {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Angular HUD Panel with cut corners - border follows clip-path */
+.hud-panel {
+  background: transparent;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Border layer that follows the clip-path */
+.hud-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--hud-border-color, rgba(0, 200, 255, 0.4));
+  clip-path: polygon(
+    12px 0%,
+    calc(100% - 12px) 0%,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0% calc(100% - 12px),
+    0% 12px
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Inner background layer with scanline animation */
+.hud-panel::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(10, 10, 20, 0.9) 100%);
+  clip-path: polygon(
+    10px 0%,
+    calc(100% - 10px) 0%,
+    100% 10px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0% calc(100% - 10px),
+    0% 10px
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Scanline animation overlay */
+.hud-panel {
+  position: relative;
+}
+
+.hud-panel > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Allow custom border colors via style attribute */
+.hud-panel[style*="borderColor"]::before {
+  background: var(--border-color, rgba(0, 200, 255, 0.4));
+}
+
+/* Corner brackets */
+.hud-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(0, 200, 255, 0.8);
+}
+
+.hud-corner-tl {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+
+.hud-corner-tr {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+}
+
+.hud-corner-bl {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+}
+
+.hud-corner-br {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+}
+
+/* Readable text styles - white with subtle glow */
+.hud-text {
+  color: #ffffff;
+  text-shadow: 
+    0 0 2px rgba(0, 200, 255, 0.5),
+    1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-weight: bold;
+}
+
+.hud-text-accent {
+  color: #00c8ff;
+  text-shadow: 
+    0 0 3px rgba(0, 200, 255, 0.6),
+    1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.hud-text-warning {
+  color: #ffaa00;
+  text-shadow: 
+    0 0 3px rgba(255, 170, 0, 0.6),
+    1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.hud-text-success {
+  color: #00ff88;
+  text-shadow: 
+    0 0 3px rgba(0, 255, 136, 0.6),
+    1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.hud-text-danger {
+  color: #ff4444;
+  text-shadow: 
+    0 0 3px rgba(255, 68, 68, 0.6),
+    1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Health bar with tech style */
+.hud-health-bar {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 200, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.hud-health-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 200, 255, 0.1) 2px,
+    rgba(0, 200, 255, 0.1) 4px
+  );
+  pointer-events: none;
+}
+
+.hud-health-fill {
+  background: linear-gradient(90deg, #00ff88 0%, #00c8ff 100%);
+  height: 100%;
+  position: relative;
+  box-shadow: 
+    0 0 4px rgba(0, 255, 136, 0.6),
+    inset 0 0 4px rgba(255, 255, 255, 0.2);
+}
+
+.hud-health-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: dataFlow 2s linear infinite;
+}
+
+/* Ammo bar */
+.hud-ammo-bar {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.hud-ammo-fill {
+  background: linear-gradient(90deg, #ffaa00 0%, #ff8800 100%);
+  height: 100%;
+  position: relative;
+  box-shadow: 
+    0 0 4px rgba(255, 170, 0, 0.6),
+    inset 0 0 4px rgba(255, 255, 255, 0.2);
+}
+
+.hud-ammo-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: dataFlow 2s linear infinite;
+}
+
+/* Angular button style */
+.hud-button {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(10, 10, 20, 0.9) 100%);
+  border: 2px solid rgba(0, 200, 255, 0.5);
+  color: #ffffff;
+  clip-path: polygon(
+    8px 0%,
+    calc(100% - 8px) 0%,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0% calc(100% - 8px),
+    0% 8px
+  );
+  transition: all 0.2s ease;
+}
+
+.hud-button:hover {
+  border-color: rgba(0, 200, 255, 0.9);
+  box-shadow: 
+    0 0 8px rgba(0, 200, 255, 0.4),
+    inset 0 0 8px rgba(0, 200, 255, 0.1);
+}
+
+/* Main menu button style - clipped from top-left and bottom-right */
+.menu-main-button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* Border layer that follows the clip-path */
+.menu-main-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 200, 255, 0.6);
+  clip-path: polygon(
+    20px 0%,
+    100% 0%,
+    100% calc(100% - 20px),
+    calc(100% - 20px) 100%,
+    0% 100%,
+    0% 20px
+  );
+  z-index: 0;
+}
+
+/* Inner background layer */
+.menu-main-button::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 20, 0.98) 100%);
+  clip-path: polygon(
+    18px 0%,
+    100% 0%,
+    100% calc(100% - 18px),
+    calc(100% - 18px) 100%,
+    0% 100%,
+    0% 18px
+  );
+  z-index: 1;
+}
+
+.menu-main-button:hover::before {
+  background: rgba(0, 200, 255, 1);
+  box-shadow: 
+    0 0 15px rgba(0, 200, 255, 0.5),
+    0 0 30px rgba(0, 200, 255, 0.3);
+}
+
+.menu-main-button:hover::after {
+  background: linear-gradient(135deg, rgba(0, 20, 40, 0.98) 0%, rgba(10, 30, 50, 0.98) 100%);
 }
