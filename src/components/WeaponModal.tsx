@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Weapon } from '../types/game';
 import { spriteManager } from '../utils/spriteManager';
 import { useEffect, useRef } from 'react';
@@ -10,6 +11,7 @@ interface WeaponModalProps {
 }
 
 const WeaponModal = ({ weapon, onConfirm, onClose }: WeaponModalProps) => {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -98,21 +100,21 @@ const WeaponModal = ({ weapon, onConfirm, onClose }: WeaponModalProps) => {
 
         <div className="hud-text mb-4" style={{ fontSize: '16px' }}>
           <div className="mb-2">
-            <span className="hud-text-accent">DAMAGE:</span> <span className="hud-text-warning ml-2">{weapon.baseDamage}</span>
+            <span className="hud-text-accent">{t('damage')}:</span> <span className="hud-text-warning ml-2">{weapon.baseDamage}</span>
           </div>
           <div className="mb-2">
-            <span className="hud-text-accent">FIRERATE:</span> <span className="hud-text-warning ml-2">{calculateFirerate(weapon.cooldown).toFixed(5)}</span>
+            <span className="hud-text-accent">{t('firerate')}:</span> <span className="hud-text-warning ml-2">{calculateFirerate(weapon.cooldown).toFixed(5)}</span>
           </div>
           {weapon.range && (
             <div className="mb-2">
-              <span className="hud-text-accent">RANGE:</span> <span className="hud-text-warning ml-2">{weapon.range}</span>
+              <span className="hud-text-accent">{t('range')}:</span> <span className="hud-text-warning ml-2">{weapon.range}</span>
             </div>
           )}
           <div className="mt-3 hud-text-warning font-bold text-center" style={{ fontSize: '12px', fontFamily: 'monospace' }}>
             {weapon.id?.startsWith('default-') 
-              ? '[DEFAULT WEAPON]' 
+              ? t('defaultWeapon')
               : weapon.id 
-                ? `NFT: ${weapon.id.slice(0, 6)}...${weapon.id.slice(-4)}`
+                ? t('nftIdShort', { nftId: `${weapon.id.slice(0, 6)}...${weapon.id.slice(-4)}` })
                 : ''}
           </div>
         </div>
@@ -123,14 +125,14 @@ const WeaponModal = ({ weapon, onConfirm, onClose }: WeaponModalProps) => {
             className="hud-button py-3 px-6 font-bold"
             style={{ fontSize: '14px', imageRendering: 'pixelated', borderColor: 'rgba(0, 200, 255, 0.5)' }}
           >
-            <span className="hud-text">CANCEL</span>
+            <span className="hud-text">{t('cancel')}</span>
           </button>
           <button
             onClick={onConfirm}
             className="hud-button py-3 px-6 font-bold"
             style={{ fontSize: '14px', imageRendering: 'pixelated', borderColor: 'rgba(0, 255, 136, 0.5)' }}
           >
-            <span className="hud-text-success">CONFIRM</span>
+            <span className="hud-text-success">{t('confirm')}</span>
           </button>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef } from 'react';
 import { Weapon } from '../types/game';
 import { getRarityColor, getRarityBorderColor, getDebugWeapons } from '../data/weapons';
@@ -14,7 +15,8 @@ interface WeaponSelectionProps {
 const WeaponSelection = ({ onSelectWeapon, onBack, availableWeapons, loading }: WeaponSelectionProps) => {
   // Check for debug flag from environment
   const isDebugMode = import.meta.env.VITE_DEBUG_WEAPONS === 'true';
-  
+  const { t } = useTranslation();
+
   // Use debug weapons if flag is enabled, otherwise use available weapons
   const displayWeapons = isDebugMode ? getDebugWeapons() : availableWeapons;
   
@@ -100,17 +102,17 @@ const WeaponSelection = ({ onSelectWeapon, onBack, availableWeapons, loading }: 
             borderColor: 'rgba(0, 200, 255, 0.5)'
           }}
         >
-          <span className="hud-text">← BACK</span>
+          <span className="hud-text">{t('back')}</span>
         </button>
       )}
       <div className="text-center pt-24 pb-8 relative flex-shrink-0" style={{ zIndex: 10 }}>
         <h1 className="hud-text-accent mb-4 font-bold" style={{ fontSize: '40px' }}>
-          CHOOSE A WEAPON FROM YOUR INVENTORY
+          {t('chooseAWeapon')}
         </h1>
         
         {loading && !isDebugMode && (
           <div className="hud-text-warning text-center font-bold text-2xl animate-pulse">
-            LOADING WEAPONS...
+            {t('loadingWeapons')}
           </div>
         )}
       </div>

@@ -40,10 +40,10 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
     },
     {
       id: 'mysterious_lazer_enemy',
-      title: 'MYSTERIOUS THREAT DETECTED',
-      date: 'Dec 2, 2025',
+      title: t('mainMenu.news.mysterious_lazer_enemy.title'),
+      date: t('mainMenu.news.mysterious_lazer_enemy.date'),
       image: '/assets/sprites/enemy_lazer.png',
-      description: 'A new, unknown enemy type has been spotted in the higher waves. Survivors report seeing a dark silhouette with an ominous presence. Very little is known about this mysterious foe - it appears only in waves 3 and beyond. Approach with extreme caution. Its true nature and capabilities remain a mystery...'
+      description: t('mainMenu.news.mysterious_lazer_enemy.description')
     },
     {
       id: 'legendary_machine_gun',
