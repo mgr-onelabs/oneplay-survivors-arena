@@ -12,7 +12,6 @@ interface PowerUpSelectionProps {
 const PowerUpSelection = ({ powerUps, onSelectPowerUp, wave }: PowerUpSelectionProps) => {
   const { t } = useTranslation();
 
-
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       // Only handle if modal is visible (prevent conflicts with other key handlers)
@@ -58,58 +57,40 @@ const PowerUpSelection = ({ powerUps, onSelectPowerUp, wave }: PowerUpSelectionP
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50" style={{ fontFamily: "'Pixelify Sans', sans-serif" }}>
-      <div className="hud-panel p-12 max-w-6xl shadow-2xl relative" style={{ imageRendering: 'pixelated' }}>
-        <div className="hud-corner hud-corner-tl"></div>
-        <div className="hud-corner hud-corner-tr"></div>
-        <div className="hud-corner hud-corner-bl"></div>
-        <div className="hud-corner hud-corner-br"></div>
-        <div className="text-center mb-8">
-          <h2 className="hud-text-success mb-4 font-bold" style={{ fontSize: '48px' }}>{t('levelUp')}</h2>
-          <p className="hud-text-warning font-bold" style={{ fontSize: '24px' }}>{t('waveComplete', { wave })}</p>
-        </div>
+        <div className="hud-panel p-12 max-w-6xl shadow-2xl relative" style={{ imageRendering: 'pixelated' }}>
+          <div className="hud-corner hud-corner-tl"></div>
+          <div className="hud-corner hud-corner-tr"></div>
+          <div className="hud-corner hud-corner-bl"></div>
+          <div className="hud-corner hud-corner-br"></div>
+          <div className="text-center mb-8">
+            <h2 className="hud-text-success mb-4 font-bold" style={{ fontSize: '48px' }}>{t('levelUp')}</h2>
+            <p className="hud-text-warning font-bold" style={{ fontSize: '24px' }}>{t('waveComplete', { wave })}</p>
+          </div>
 
-        <div className="flex gap-6 justify-center flex-wrap">
-          {powerUps.map((powerUp, index) => (
-            <button
-              key={powerUp.id}
-              onClick={() => onSelectPowerUp(powerUp)}
-              className="hud-panel p-6 w-72 transition-all relative hover:scale-105"
-              style={{ 
-                imageRendering: 'pixelated',
-                borderColor: 'rgba(0, 200, 255, 0.5)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(0, 200, 255, 0.9)';
-                e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 200, 255, 0.4), inset 0 0 15px rgba(0, 200, 255, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(0, 200, 255, 0.5)';
-                e.currentTarget.style.boxShadow = '';
-              }}
-            >
-              <div className="hud-corner hud-corner-tl"></div>
-              <div className="hud-corner hud-corner-tr"></div>
-              <div className="hud-corner hud-corner-bl"></div>
-              <div className="hud-corner hud-corner-br"></div>
-              <div className="text-center mb-3">
-                <div className="mb-2 flex justify-center items-center" style={{ minHeight: '48px' }}>
-                  <div style={{ filter: 'drop-shadow(0 0 3px rgba(0, 200, 255, 0.6))' }}>
-                  <PixelIcon name={getPowerUpIcon(powerUp.id)} size={48} />
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {powerUps.map((powerUp, index) => (
+              <div
+                key={powerUp.id}
+                className="bg-gray-800 p-4 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors flex flex-col items-center text-center"
+                onClick={() => onSelectPowerUp(powerUp)}
+              >
+                <div className="text-4xl mb-2">
+                  <PixelIcon name={getPowerUpIcon(powerUp.id)} />
                 </div>
-                <div className="hud-text-warning font-bold mb-2" style={{ fontSize: '28px' }}>
-                  [{index + 1}]
+                <h3 className="text-lg font-bold text-white mb-2">
+                  {t(powerUp.name)}
+                </h3>
+                <p className="text-sm text-gray-400">
+                  {t(powerUp.description)}
+                </p>
+                <div className="mt-4 text-sm font-bold text-white">
+                  Press {index + 1}
                 </div>
               </div>
-              <h3 className="hud-text mb-4 font-bold text-center" style={{ fontSize: '18px' }}>{t(powerUp.name).toUpperCase()}</h3>
-              <p className="hud-text-accent font-bold text-center" style={{ fontSize: '14px', lineHeight: '1.5' }}>{t(powerUp.description).toUpperCase()}</p>
-            </button>
-          ))}
+            ))}
+          </div>
         </div>
-
-        <p className="hud-text text-center mt-8 font-bold" style={{ fontSize: '20px' }}>{t('pressToSelect')}</p>
       </div>
-    </div>
     </>
   );
 };
