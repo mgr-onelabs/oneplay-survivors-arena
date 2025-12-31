@@ -223,7 +223,7 @@ const Inventory = ({ onBack, playerInventory, loading }: InventoryProps) => {
         {/* Left side - Weapon list */}
         <div className="w-1/3 p-8 pt-20 border-r-2 border-cyan-500/30 overflow-y-auto flex-shrink-0 relative weapons-scrollable" style={{ zIndex: 10 }}>
           <h1 className="hud-text-accent mb-8 text-center font-bold" style={{ fontSize: '32px' }}>
-            INVENTORY
+            {t('inventory')}
           </h1>
 
           <div className="flex flex-col gap-4">
