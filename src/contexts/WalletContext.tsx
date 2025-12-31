@@ -410,12 +410,14 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const checkChain = async () => {
     try {
       const wallet = getWallet();
+      console.log('Checking chain for wallet:', wallet);
       if (!wallet) {
         setWalletState((prev) => ({ ...prev, chainId: null, isCorrectChain: false }));
         return;
       }
 
       const suiProvider = getSuiProvider(wallet);
+      console.log('Using Sui provider:', suiProvider);
       if (!suiProvider) {
         setWalletState((prev) => ({ ...prev, chainId: null, isCorrectChain: false }));
         return;
@@ -427,8 +429,10 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
       // Method 1: Try getChain() method
       if (typeof suiProvider.getChain === 'function') {
+        console.log('Attempting to get chain from provider:',typeof suiProvider.getChain);
         try {
           chainId = await suiProvider.getChain();
+          console.log('Chain ID from getChain():', chainId);
         } catch (e) {
           console.log('getChain() not available:', e);
         }

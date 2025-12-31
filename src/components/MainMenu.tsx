@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useOneWallet } from '../hooks/useOneWallet';
 import { useMusic } from '../contexts/MusicContext';
 import WalletWarningModal from './WalletWarningModal';
@@ -12,6 +13,7 @@ interface MainMenuProps {
 }
 
 const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }: MainMenuProps) => {
+  const { t, i18n } = useTranslation();
   const { connected, address, connect, disconnect, installWallet, isWalletInstalled, isCorrectChain, chainId, checkChain } = useOneWallet();
   const { isMusicEnabled, toggleMusic, isSfxEnabled, toggleSfx } = useMusic();
   
@@ -45,31 +47,31 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
     },
     {
       id: 'legendary_machine_gun',
-      title: 'LEGENDARY MACHINE GUN',
-      date: 'Dec 1, 2025',
+      title: t('mainMenu.news.legendary_machine_gun.title'),
+      date: t('mainMenu.news.legendary_machine_gun.date'),
       image: '/assets/pngegg (2).png',
-      description: 'A new Prototype weapon has been discovered! The Plasma Cannon is now available exclusively from Supply Caches. This ultra-rare weapon features an extremely high fire rate and can only be obtained as a Prototype rarity. Good luck finding one!'
+      description: t('mainMenu.news.legendary_machine_gun.description')
     },
     {
       id: 'vest_system',
-      title: 'VEST SYSTEM ADDED',
-      date: 'Nov 30, 2025',
+      title: t('mainMenu.news.vest_system.title'),
+      date: t('mainMenu.news.vest_system.date'),
       image: '/assets/vest.png',
-      description: 'Protective vests are now available! Collect vests to gain up to 120 blue health (armor) that absorbs damage before your regular health. Vests can spawn randomly or be dropped by defeated enemies. Stay protected out there!'
+      description: t('mainMenu.news.vest_system.description')
     },
     {
       id: 'ammo_system',
-      title: 'AMMO DROP SYSTEM',
-      date: 'Nov 29, 2025',
+      title: t('mainMenu.news.ammo_system.title'),
+      date: t('mainMenu.news.ammo_system.date'),
       image: '/assets/ammo.png',
-      description: 'Ammo management is now in effect! Non-sword weapons have limited ammo per wave. Collect ammo pickups that spawn randomly or drop from enemies to keep your weapons loaded. Watch your ammo count and stay stocked!'
+      description: t('mainMenu.news.ammo_system.description')
     },
     {
       id: 'encyclopedia_nov25_2025',
-      title: 'ENCYCLOPEDIA ADDED',
-      date: 'Nov 25, 2025',
+      title: t('mainMenu.news.encyclopedia_nov25_2025.title'),
+      date: t('mainMenu.news.encyclopedia_nov25_2025.date'),
       image: '/assets/guide/encyclopedia_preview.png',
-      description: 'A comprehensive Encyclopedia has been added to the game! Learn about all enemy types, their abilities, lore, and discover pro tips for using your abilities effectively. Access it from the GUIDE button in the top-left corner.'
+      description: t('mainMenu.news.encyclopedia_nov25_2025.description')
     }
   ];
 
@@ -170,7 +172,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               opacity: isMusicEnabled ? 1 : 0.5,
               borderColor: 'rgba(0, 200, 255, 0.5)'
             }}
-            title={isMusicEnabled ? 'Music ON - Click to turn off' : 'Music OFF - Click to turn on'}
+            title={t('musicOnTitle')}
           >
             {isMusicEnabled ? '🎵' : '🔇'}
           </button>
@@ -179,7 +181,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             <div className="hud-corner hud-corner-tr"></div>
             <div className="hud-corner hud-corner-bl"></div>
             <div className="hud-corner hud-corner-br"></div>
-            <span className="hud-text font-bold text-sm">MUSIC {isMusicEnabled ? 'ON' : 'OFF'}</span>
+            <span className="hud-text font-bold text-sm">{t('music')} {isMusicEnabled ? t('on') : t('off')}</span>
           </span>
         </div>
 
@@ -197,7 +199,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               opacity: isSfxEnabled ? 1 : 0.5,
               borderColor: 'rgba(0, 200, 255, 0.5)'
             }}
-            title={isSfxEnabled ? 'SFX ON - Click to turn off' : 'SFX OFF - Click to turn on'}
+             title={t('sfxOnTitle')}
           >
             {isSfxEnabled ? '🔊' : '🔈'}
           </button>
@@ -206,7 +208,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             <div className="hud-corner hud-corner-tr"></div>
             <div className="hud-corner hud-corner-bl"></div>
             <div className="hud-corner hud-corner-br"></div>
-            <span className="hud-text font-bold text-sm">SFX {isSfxEnabled ? 'ON' : 'OFF'}</span>
+            <span className="hud-text font-bold text-sm">{t('sfx')} {isSfxEnabled ? t('on') : t('off')}</span>
           </span>
         </div>
 
@@ -232,7 +234,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             <div className="hud-corner hud-corner-tr"></div>
             <div className="hud-corner hud-corner-bl"></div>
             <div className="hud-corner hud-corner-br"></div>
-            <span className="hud-text font-bold text-sm">GUIDE</span>
+            <span className="hud-text font-bold text-sm">{t('guide')}</span>
           </span>
         </div>
 
@@ -247,7 +249,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                 imageRendering: 'pixelated',
                 borderColor: 'rgba(0, 200, 255, 0.5)'
               }}
-              title="Latest News"
+              title={t('newsTitle')}
             >
               📰
             </button>
@@ -264,9 +266,23 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             <div className="hud-corner hud-corner-tr"></div>
             <div className="hud-corner hud-corner-bl"></div>
             <div className="hud-corner hud-corner-br"></div>
-            <span className="hud-text font-bold text-sm">NEWS</span>
+            <span className="hud-text font-bold text-sm">{t('news')}</span>
           </span>
         </div>
+      </div>
+
+      {/* Language switcher - top right */}
+      <div className="absolute top-8 right-80 z-20">
+        <button
+          onClick={() => {
+            const newLang = i18n.language === 'en' ? 'zh' : 'en';
+            i18n.changeLanguage(newLang);
+          }}
+          className="wallet-button border-2 border-white/50 py-2 px-4 text-white text-sm font-bold transition-all rounded"
+          style={{ fontSize: '14px', imageRendering: 'pixelated' }}
+        >
+          {i18n.language === 'en' ? '中文' : 'English'}
+        </button>
       </div>
 
       {/* Wallet connection button - top right */}
@@ -291,7 +307,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                 className="hud-button py-2 px-4 text-sm font-bold"
                 style={{ fontSize: '14px', imageRendering: 'pixelated', borderColor: 'rgba(0, 255, 136, 0.5)' }}
               >
-                <span className="hud-text-success">DISCONNECT</span>
+                <span className="hud-text-success"> {t('disconnect')}</span>
               </button>
             </div>
             {!isCorrectChain && (
@@ -310,7 +326,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             className="hud-button py-2 px-4 text-sm font-bold"
             style={{ fontSize: '14px', imageRendering: 'pixelated', borderColor: 'rgba(0, 200, 255, 0.5)' }}
           >
-            <span className="hud-text">{isWalletInstalled() ? 'CONNECT ONECHAIN WALLET' : 'INSTALL ONECHAIN WALLET'}</span>
+            <span className="hud-text">{isWalletInstalled() ? t('connectWallet') : t('installWallet')}</span>
           </button>
         )}
       </div>
@@ -336,7 +352,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               '0 0 45px rgba(0, 200, 255, 0.5)'
           } as React.CSSProperties}
         >
-          SURVIVAL ARENA
+           {t('gameTitle')}
         </h1>
       </div>
       
@@ -351,7 +367,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               imageRendering: 'pixelated'
             }}
           >
-            <span className="hud-text-accent relative z-10">PLAY</span>
+            <span className="hud-text-accent relative z-10">{t('play')}</span>
           </button>
           
           {/* Trophy icon button - positioned to the right, slightly upward */}
@@ -372,7 +388,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             onMouseLeave={(e) => {
               e.currentTarget.style.filter = 'drop-shadow(0 0 3px rgba(255, 170, 0, 0.6))';
             }}
-            title="Achievements"
+            title={t('achievements')}
           >
             🏆
           </button>
@@ -386,7 +402,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             imageRendering: 'pixelated'
           }}
         >
-          <span className="hud-text relative z-10">INVENTORY</span>
+          <span className="hud-text relative z-10"> {t('inventory')}</span>
         </button>
 
         <button
@@ -397,7 +413,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             imageRendering: 'pixelated'
           }}
         >
-          <span className="hud-text relative z-10">SUPPLY CACHE</span>
+          <span className="hud-text relative z-10"> {t('dailyChest')}</span>
         </button>
 
         <button
@@ -408,7 +424,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
             imageRendering: 'pixelated'
           }}
         >
-          <span className="hud-text relative z-10">MARKETPLACE</span>
+          <span className="hud-text relative z-10">{t('marketplace')}</span>
         </button>
       </div>
 
@@ -419,27 +435,27 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
           <div className="hud-corner hud-corner-tr"></div>
           <div className="hud-corner hud-corner-bl"></div>
           <div className="hud-corner hud-corner-br"></div>
-          <p className="hud-text-warning text-sm font-bold mb-2">CONTROLS</p>
+          <p className="hud-text-warning text-sm font-bold mb-2">{t('controls')}</p>
           <div className="flex gap-8 text-xs">
             <div className="flex flex-col items-center">
               <span className="hud-text font-bold">WASD</span>
-              <span className="hud-text-accent">MOVE</span>
+              <span className="hud-text-accent">{t('move')}</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="hud-text font-bold">MOUSE</span>
-              <span className="hud-text-accent">AIM</span>
+              <span className="hud-text-accent">{t('aim')}</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="hud-text font-bold">L-CLICK</span>
-              <span className="hud-text-accent">SHOOT</span>
+              <span className="hud-text-accent">{t('shoot')}</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="hud-text font-bold">1 - 5</span>
-              <span className="hud-text-accent">ABILITIES</span>
+              <span className="hud-text-accent">{t('abilities')}</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="hud-text font-bold">E</span>
-              <span className="hud-text-accent">INTERACT</span>
+              <span className="hud-text-accent">{t('interact')}</span>
             </div>
           </div>
         </div>
@@ -471,20 +487,22 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               className="hud-text-danger text-2xl font-bold mb-4 text-center"
               style={{ imageRendering: 'pixelated' }}
             >
-              WRONG NETWORK
+              {t('wrongNetworkTitle')}
             </h2>
             
             <p className="hud-text text-lg mb-4 text-center">
-              Your wallet is connected to the wrong network.
+              {t('wrongNetworkMessage')}
             </p>
             
-            <p className="hud-text-warning text-base mb-6 text-center font-bold">
-              Please switch to <span className="hud-text-accent">OneChain Testnet</span> in your wallet settings.
+            <p className="text-yellow-300 text-base mb-6 text-center font-bold">
+                            <Trans i18nKey="switchToTestnet">
+                Please switch to <span className="text-cyan-300">OneChain Testnet</span> in your wallet settings.
+              </Trans>
             </p>
 
             {chainId && (
               <p className="hud-text-accent text-sm mb-6 text-center">
-                Current network: {chainId}
+                 {t('currentNetwork', { chainId })}
               </p>
             )}
             
@@ -497,14 +515,14 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                 className="hud-button py-2 px-6 font-bold"
                 style={{ fontSize: '16px', imageRendering: 'pixelated', borderColor: 'rgba(0, 200, 255, 0.5)' }}
               >
-                <span className="hud-text">CHECK AGAIN</span>
+                <span className="hud-text">{t('checkAgain')}</span>
               </button>
               <button
                 onClick={() => setShowChainWarning(false)}
                 className="hud-button py-2 px-6 font-bold"
                 style={{ fontSize: '16px', imageRendering: 'pixelated', borderColor: 'rgba(255, 68, 68, 0.5)' }}
               >
-                <span className="hud-text-danger">CLOSE</span>
+                <span className="hud-text-danger"> {t('close')}</span>
               </button>
             </div>
           </div>
@@ -540,7 +558,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                 className="hud-text-accent text-2xl font-bold mb-6 text-center border-b-2 border-cyan-500/50 pb-4"
               style={{ imageRendering: 'pixelated' }}
             >
-              LATEST NEWS
+              {t('latestNews')}
             </h2>
             </div>
             
@@ -611,16 +629,15 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
               className="hud-text-warning text-2xl font-bold mb-4 text-center"
               style={{ imageRendering: 'pixelated' }}
             >
-              MARKETPLACE
+              {t('marketplace')}
             </h2>
             
             <p className="hud-text text-lg mb-6 text-center font-bold">
-              COMING SOON
+              {t('comingSoon')}
             </p>
             
             <p className="hud-text-accent text-base mb-6 text-center">
-              The marketplace feature is under development. 
-              Check back soon to buy and sell weapons!
+              {t('marketplaceComingSoon')}
             </p>
             
             <div className="flex justify-center">
@@ -629,7 +646,7 @@ const MainMenu = ({ onPlay, onInventory, onDailyChest, onAchievements, onGuide }
                 className="hud-button py-2 px-8 font-bold"
                 style={{ fontSize: '16px', imageRendering: 'pixelated', borderColor: 'rgba(0, 200, 255, 0.5)' }}
               >
-                <span className="hud-text">CLOSE</span>
+                <span className="hud-text">{t('close')}</span>
               </button>
             </div>
           </div>
