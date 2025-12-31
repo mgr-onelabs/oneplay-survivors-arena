@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useOneWallet } from '../contexts/WalletContext';
 import { ACHIEVEMENTS } from '../data/achievements';
@@ -20,6 +21,7 @@ interface OwnedAchievement {
 }
 
 const Achievements = ({ onBack }: AchievementsProps) => {
+  const { t } = useTranslation();
   const { connected, address, client, connect, disconnect, installWallet, isWalletInstalled, isCorrectChain } = useOneWallet();
   const [ownedAchievements, setOwnedAchievements] = useState<OwnedAchievement[]>([]);
   const [loading, setLoading] = useState(false);
@@ -125,7 +127,7 @@ const Achievements = ({ onBack }: AchievementsProps) => {
           borderColor: 'rgba(0, 200, 255, 0.5)'
         }}
       >
-        <span className="hud-text">← BACK</span>
+        <span className="hud-text">{t('back')}</span>
       </button>
 
       {/* Wallet connection button - top right */}
@@ -169,20 +171,20 @@ const Achievements = ({ onBack }: AchievementsProps) => {
         <div className="hud-corner hud-corner-tr"></div>
         <div className="hud-corner hud-corner-bl"></div>
         <div className="hud-corner hud-corner-br"></div>
-        <h1 className="hud-text-accent mb-8 font-bold" style={{ fontSize: '48px' }}>ACHIEVEMENTS</h1>
+        <h1 className="hud-text-accent mb-8 font-bold" style={{ fontSize: '48px' }}>{t('achievements')}</h1>
         
         {loading && (
-          <div className="hud-text-warning text-xl font-bold mb-4 animate-pulse">LOADING ACHIEVEMENTS...</div>
+          <div className="hud-text-warning text-xl font-bold mb-4 animate-pulse">{t('loadingAchievements')}</div>
         )}
 
         {!connected && (
-          <div className="hud-text-accent text-lg font-bold mb-4">Connect your wallet to view achievements</div>
+          <div className="hud-text-accent text-lg font-bold mb-4">{t('connectWalletToViewAchievements')}</div>
         )}
 
         <div className="overflow-y-auto flex-1 pr-4 custom-scrollbar">
           {displayedAchievements.length === 0 && !loading && connected && (
             <div className="hud-text-accent text-lg font-bold text-center py-8">
-              No achievements owned yet. Play the game to unlock achievements!
+              {t('noAchievementsOwned')}
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -213,15 +215,15 @@ const Achievements = ({ onBack }: AchievementsProps) => {
                     <h3 className="hud-text-warning font-bold text-xl">
                       {achievement.title}
                     </h3>
-                    <span className="hud-text-accent text-sm">Wave {achievement.waveRequirement}</span>
+                    <span className="hud-text-accent text-sm">{t('wave', { wave: achievement.waveRequirement })}</span>
                   </div>
                   <p className="hud-text text-sm mb-2">{achievement.description}</p>
                   <div className="mt-auto pt-2 border-t border-cyan-500/20 flex flex-col gap-2">
                     <div className="flex justify-between items-center">
-                      <span className="hud-text-success text-xs font-bold">OWNED</span>
+                      <span className="hud-text-success text-xs font-bold">{t('owned')}</span>
                     </div>
                     <div className="hud-text-accent text-xs break-all">
-                      NFT ID: {achievement.nftId}
+                      {t('nftId', { nftId: achievement.nftId })}
                     </div>
                   </div>
                 </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { useOneWallet } from '../contexts/WalletContext';
 import { ACHIEVEMENTS } from '../data/achievements';
@@ -13,6 +14,7 @@ const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || '0x5f3894f6e1bb292ca51e15f
 const CLOCK_ID = import.meta.env.VITE_CLOCK_ID || '0x6';
 
 const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
+  const { t } = useTranslation();
   // Calculate survived waves: if you die during wave 1, you've survived 0 waves
   // If you die during wave 2, you've survived 1 wave, etc.
   const survivedWaves = Math.max(0, wave - 1);
@@ -131,7 +133,7 @@ const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
       
       // Check for wallet permission errors
       if (errorMessage.includes('viewAccount') || errorMessage.includes('suggestTransaction') || errorMessage.includes('permission')) {
-        setError("Your wallet is not connected properly. Please reconnect your wallet and try again.");
+        setError(t('walletConnectionError'));
       } else {
         setError(errorMessage);
       }
@@ -147,20 +149,20 @@ const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
         <div className="hud-corner hud-corner-tr"></div>
         <div className="hud-corner hud-corner-bl"></div>
         <div className="hud-corner hud-corner-br"></div>
-        <h2 className="hud-text-danger mb-4 font-bold" style={{ fontSize: '48px' }}>GAME OVER</h2>
+        <h2 className="hud-text-danger mb-4 font-bold" style={{ fontSize: '48px' }}>{t('gameOver')}</h2>
         <p className="hud-text mb-4 font-bold" style={{ fontSize: '20px' }}>
-          YOU SURVIVED {survivedWaves} WAVE{survivedWaves !== 1 ? 'S' : ''}
+          {t('youSurvived', { count: survivedWaves })}
         </p>
 
         {/* Achievement Section */}
         {checkingAchievement && (
-          <div className="hud-text-warning mb-4 animate-pulse text-xl font-bold">CHECKING ACHIEVEMENTS...</div>
+          <div className="hud-text-warning mb-4 animate-pulse text-xl font-bold">{t('checkingAchievements')}</div>
         )}
 
         {newAchievement && !minted && (
           <>
             <h3 className="hud-text-warning text-2xl mb-3 font-bold animate-pulse">
-              NEW ACHIEVEMENT UNLOCKED!
+              {t('newAchievementUnlocked')}
             </h3>
             
             <div className="flex flex-col items-center gap-3 mb-4">
@@ -206,7 +208,7 @@ const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
                 }}
               >
                 <span className={minting ? 'hud-text' : 'hud-text-warning'}>
-                {minting ? 'MINTING...' : 'MINT ACHIEVEMENT NFT'}
+                {minting ? t('minting') : t('mintAchievement')}
                 </span>
               </button>
               {error && <div className="hud-text-danger text-base font-bold mt-1">{error}</div>}
@@ -217,9 +219,9 @@ const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
         {minted && (
            <>
              <h3 className="hud-text-success text-2xl font-bold mb-1">
-               ACHIEVEMENT MINTED!
+               {t('achievementMinted')}
              </h3>
-             <p className="hud-text text-lg font-bold mb-4">Check achievements section!</p>
+             <p className="hud-text text-lg font-bold mb-4">{t('checkAchievementsSection')}</p>
            </>
         )}
 
@@ -238,7 +240,7 @@ const GameOver = ({ wave, onReturnToMenu }: GameOverProps) => {
             e.currentTarget.style.borderColor = 'rgba(255, 68, 68, 0.5)';
           }}
         >
-          <span className="hud-text-danger">RETURN TO MENU</span>
+          <span className="hud-text-danger">{t('returnToMenu')}</span>
         </button>
       </div>
     </div>
