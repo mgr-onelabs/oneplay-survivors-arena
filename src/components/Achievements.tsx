@@ -126,7 +126,7 @@ const Achievements = ({ onBack }: AchievementsProps) => {
           borderColor: 'rgba(0, 200, 255, 0.5)'
         }}
       >
-        <span className="hud-text">← {t('back')}</span>
+        <span className="hud-text">{t('back')}</span>
       </button>
 
       {/* Wallet connection button - top right */}
