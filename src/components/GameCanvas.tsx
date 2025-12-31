@@ -14,6 +14,7 @@ import { useMusic } from '../contexts/MusicContext';
 import GameUI from './GameUI';
 import PowerUpSelection from './PowerUpSelection';
 import GameOver from './GameOver';
+import { useTranslation } from 'react-i18next';
 
 interface GameCanvasProps {
   weapon: Weapon;
@@ -26,6 +27,7 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const keys = useKeyboard();
   const { isSfxEnabled } = useMusic();
+  const { t } = useTranslation();
 
   const [canvasSize, setCanvasSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const canvasWidth = canvasSize.width;
@@ -1722,7 +1724,6 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
       energyBeams.forEach((beam) => {
         if (currentTime >= beam.endTime) return; // Beam expired
         
-        // Check if player is in the energy beam
         const dx = Math.cos(beam.angle);
         const dy = Math.sin(beam.angle);
         
@@ -3545,7 +3546,7 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
                 pointerEvents: 'auto',
               }}
             >
-              <span className="hud-text-accent" style={{ fontSize: '32px' }}>⏸</span> <span className="hud-text">PAUSE</span>
+              <span className="hud-text-accent" style={{ fontSize: '32px' }}>⏸</span> <span className="hud-text">{t('pause')}</span>
             </button>
           ) : null;
         })()}
@@ -3559,7 +3560,7 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
               <div className="hud-corner hud-corner-bl"></div>
               <div className="hud-corner hud-corner-br"></div>
               <h2 className="hud-text-accent mb-8 font-bold" style={{ fontSize: '48px' }}>
-                GAME PAUSED
+                {t('gamePaused')}
               </h2>
               <div className="flex gap-6 justify-center">
                 <button
@@ -3577,7 +3578,7 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
                     e.currentTarget.style.borderColor = 'rgba(0, 255, 136, 0.5)';
                   }}
                 >
-                  <span className="hud-text-success">RESUME</span>
+                  <span className="hud-text-success">{t('resume')}</span>
                 </button>
                 <button
                   onClick={() => {
@@ -3597,7 +3598,7 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
                     e.currentTarget.style.borderColor = 'rgba(255, 68, 68, 0.5)';
                   }}
                 >
-                  <span className="hud-text-danger">EXIT</span>
+                  <span className="hud-text-danger">{t('exit')}</span>
                 </button>
               </div>
             </div>
@@ -3614,10 +3615,10 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
               <div className="hud-corner hud-corner-bl"></div>
               <div className="hud-corner hud-corner-br"></div>
               <h2 className="hud-text-danger mb-8 font-bold" style={{ fontSize: '48px' }}>
-                EXIT TO MAIN MENU?
+                {t('exitToMainMenu')}
               </h2>
               <p className="hud-text-warning mb-10 font-bold" style={{ fontSize: '20px' }}>
-                YOUR PROGRESS WILL BE LOST
+                {t('progressWillBeLost')}
               </p>
               <div className="flex gap-6 justify-center">
                 <button
@@ -3629,7 +3630,7 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
                     borderColor: 'rgba(0, 200, 255, 0.5)'
                   }}
                 >
-                  <span className="hud-text">NO</span>
+                  <span className="hud-text">{t('no')}</span>
                 </button>
                 <button
                   onClick={() => {
@@ -3643,7 +3644,7 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
                     borderColor: 'rgba(255, 68, 68, 0.5)'
                   }}
                 >
-                  <span className="hud-text-danger">YES</span>
+                  <span className="hud-text-danger">{t('yes')}</span>
                 </button>
               </div>
             </div>
@@ -3670,12 +3671,12 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
             <div className="hud-corner hud-corner-bl"></div>
             <div className="hud-corner hud-corner-br"></div>
             <h2 className="hud-text-success mb-8 font-bold" style={{ fontSize: '48px' }}>
-              WAVE {waveManagerRef.current.getCurrentWave()} COMPLETE!
+              {t('waveComplete', { wave: waveManagerRef.current.getCurrentWave() })}
             </h2>
             <div className="hud-text mb-6 font-bold" style={{ fontSize: '24px' }}>
-              PRESS <span className="hud-text-warning px-4 py-2 hud-button inline-block mx-2" style={{ fontSize: '32px', borderColor: 'rgba(255, 170, 0, 0.6)' }}>E</span> TO CONTINUE
+              {t('pressToContinue')}
             </div>
-            <p className="hud-text-accent mt-6 font-bold" style={{ fontSize: '18px' }}>TO THE NEXT WAVE</p>
+            <p className="hud-text-accent mt-6 font-bold" style={{ fontSize: '18px' }}>{t('toTheNextWave')}</p>
           </div>
         </div>
       )}
@@ -3732,7 +3733,7 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
                   {expiringAbility.secondsRemaining}
                 </div>
                 <div className="hud-text-warning font-bold mt-4" style={{ fontSize: '32px' }}>
-                  {expiringAbility.name.toUpperCase()} EXPIRING
+                  {t('abilityExpiring', { name: expiringAbility.name.toUpperCase() })}
                 </div>
               </div>
             </div>
@@ -3787,7 +3788,7 @@ const GameCanvas = ({ weapon, onReturnToMenu }: GameCanvasProps) => {
                 </div>
                 {isActive && !showCountdown && (
                   <div className="hud-text-success font-bold" style={{ fontSize: '12px' }}>
-                    ACTIVE
+                    {t('active')}
                   </div>
                 )}
                 {showCountdown && (

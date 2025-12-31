@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PowerUp } from '../types/game';
 import { PixelIcon } from '../utils/pixelIcons';
 
@@ -9,6 +10,9 @@ interface PowerUpSelectionProps {
 }
 
 const PowerUpSelection = ({ powerUps, onSelectPowerUp, wave }: PowerUpSelectionProps) => {
+  const { t } = useTranslation();
+
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       // Only handle if modal is visible (prevent conflicts with other key handlers)
@@ -60,8 +64,8 @@ const PowerUpSelection = ({ powerUps, onSelectPowerUp, wave }: PowerUpSelectionP
         <div className="hud-corner hud-corner-bl"></div>
         <div className="hud-corner hud-corner-br"></div>
         <div className="text-center mb-8">
-          <h2 className="hud-text-success mb-4 font-bold" style={{ fontSize: '48px' }}>LEVEL UP!</h2>
-          <p className="hud-text-warning font-bold" style={{ fontSize: '24px' }}>WAVE {wave} COMPLETE</p>
+          <h2 className="hud-text-success mb-4 font-bold" style={{ fontSize: '48px' }}>{t('levelUp')}</h2>
+          <p className="hud-text-warning font-bold" style={{ fontSize: '24px' }}>{t('waveComplete', { wave })}</p>
         </div>
 
         <div className="flex gap-6 justify-center flex-wrap">
@@ -97,13 +101,13 @@ const PowerUpSelection = ({ powerUps, onSelectPowerUp, wave }: PowerUpSelectionP
                   [{index + 1}]
                 </div>
               </div>
-              <h3 className="hud-text mb-4 font-bold text-center" style={{ fontSize: '18px' }}>{powerUp.name.toUpperCase()}</h3>
-              <p className="hud-text-accent font-bold text-center" style={{ fontSize: '14px', lineHeight: '1.5' }}>{powerUp.description.toUpperCase()}</p>
+              <h3 className="hud-text mb-4 font-bold text-center" style={{ fontSize: '18px' }}>{t(powerUp.name).toUpperCase()}</h3>
+              <p className="hud-text-accent font-bold text-center" style={{ fontSize: '14px', lineHeight: '1.5' }}>{t(powerUp.description).toUpperCase()}</p>
             </button>
           ))}
         </div>
 
-        <p className="hud-text text-center mt-8 font-bold" style={{ fontSize: '20px' }}>PRESS <span className="hud-text-warning">1</span>, <span className="hud-text-warning">2</span>, OR <span className="hud-text-warning">3</span> TO SELECT</p>
+        <p className="hud-text text-center mt-8 font-bold" style={{ fontSize: '20px' }}>{t('pressToSelect')}</p>
       </div>
     </div>
     </>
